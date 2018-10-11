@@ -1,6 +1,7 @@
+import Vue from 'vue';
 import { createOidcAuth, SignInType } from '@/lib/VueOidcClient';
 
-var mainClient = createOidcAuth('main', SignInType.Popup, {
+var mainClient = createOidcAuth(SignInType.Popup, 'http://localhost:8080/', {
   authority: 'https://demo.identityserver.io/',
   client_id: 'implicit', // 'implicit.shortlived',
   response_type: 'id_token token',
@@ -14,5 +15,5 @@ var mainClient = createOidcAuth('main', SignInType.Popup, {
   // ResponseValidatorCtor?: ResponseValidatorCtor;
   // MetadataServiceCtor?: MetadataServiceCtor;
 });
-
+Vue.use(mainClient);
 export default mainClient;
