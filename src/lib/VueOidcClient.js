@@ -12,7 +12,6 @@ export const SignInType = {
 
 export function createOidcAuth(
   defaultSignInType,
-  baseUrl,
   oidcConfig,
   logger = console
 ) {
@@ -25,6 +24,8 @@ export function createOidcAuth(
   if (!oidcConfig) {
     throw new Error('No config provided to oidc auth.');
   }
+  const loco = window.location;
+  const baseUrl = `${loco.protocol}//${loco.host}${process.env.BASE_URL}`;
 
   Log.logger = logger;
   Log.level = Log.DEBUG;
@@ -160,6 +161,17 @@ export function createOidcAuth(
     };
   }
 
+  function redirectAfterSignout(router) {
+    if (router) {
+      const current = router.currentRoute;
+      if (current && current.meta.authName === providerId) {
+        router.replace('/');
+        return;
+      }
+    }
+    window.location = baseUrl;
+  }
+
   let _inited = false;
   const auth = new Vue({
     data() {
@@ -261,13 +273,20 @@ export function createOidcAuth(
           }
         ];
       },
-      signOut(args) {
+      signIn(args) {
+        return signIn(defaultSignInType, args);
+      },
+      signOut(router, args) {
         if (defaultSignInType === SignInType.Popup) {
-          return mgr.signoutPopup(args).then(() => {
-            if (!this.isAuthenticated) {
-              // TODO: check if current route is protected and redirect away
-            }
-          });
+          return mgr
+            .signoutPopup(args)
+            .then(() => {
+              redirectAfterSignout(router);
+            })
+            .catch(() => {
+              // could be window closed
+              redirectAfterSignout(router);
+            });
         }
         return mgr.signoutRedirect(args);
       }

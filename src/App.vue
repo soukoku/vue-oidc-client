@@ -4,7 +4,7 @@
       <router-link to="/">Home</router-link> |
       <router-link to="/about">About</router-link> |
       <a href="#"
-         @click="$oidc.signOut"
+         @click="$oidc.signOut($router)"
          v-if="$oidc.isAuthenticated">Signout</a>
     </div>
     <router-view />
