@@ -1,15 +1,44 @@
 import Vue from 'vue';
 import { UserManager, Log, WebStorageStateStore } from 'oidc-client';
 
+Log.level = Log.DEBUG;
+
+/**
+ * Indicates the sign in behavior.
+ */
 export const SignInType = {
+  /**
+   * Uses the main browser window to do sign-in.
+   */
   Window: 0,
+  /**
+   * Uses a popup window to do sign-in.
+   */
   Popup: 1,
+  /**
+   * Uses a hidden iframe to do sign-in.
+   */
   Silent: 2,
+  /**
+   * String value map for Window.
+   */
   0: 'Window',
+  /**
+   * String value map for Popup.
+   */
   1: 'Popup',
+  /**
+   * String value map for Silent.
+   */
   2: 'Silent'
 };
 
+/**
+ * Creates an openid-connect auth instance.
+ * @param {SignInType} defaultSignInType - signin method to use when signIn()/signOut() are called.
+ * @param {Object} oidcConfig - config object for oidc-client.
+ * @param {Object} logger
+ */
 export function createOidcAuth(
   defaultSignInType,
   oidcConfig,
@@ -24,12 +53,15 @@ export function createOidcAuth(
   if (!oidcConfig) {
     throw new Error('No config provided to oidc auth.');
   }
-  const loco = window.location;
-  const baseUrl = `${loco.protocol}//${loco.host}${process.env.BASE_URL}`;
+
+  const providerId = oidcConfig.client_id;
+  const appUrl = oidcConfig.post_logout_redirect_uri;
+  if (!appUrl) {
+    throw new Error('post_logout_redirect_uri is required.');
+  }
 
   Log.logger = logger;
-  Log.level = Log.DEBUG;
-  const providerId = oidcConfig.client_id;
+
   // merge overrides with defaults
   const config = {
     response_type: `id_token`,
@@ -43,11 +75,10 @@ export function createOidcAuth(
       store: localStorage
     }),
     ...oidcConfig, // fixed paths
-    redirect_uri: `${baseUrl}auth/${providerId}/signinwin`,
-    post_logout_redirect_uri: `http://localhost:8080`,
-    popup_post_logout_redirect_uri: `${baseUrl}auth/${providerId}/signout`,
-    popup_redirect_uri: `${baseUrl}auth/${providerId}/signinpop`,
-    silent_redirect_uri: `${baseUrl}auth/${providerId}/signinsilent`
+    redirect_uri: `${appUrl}auth/signinwin/${providerId}`,
+    popup_post_logout_redirect_uri: `${appUrl}auth/signoutpop/${providerId}`,
+    popup_redirect_uri: `${appUrl}auth/signinpop/${providerId}`,
+    silent_redirect_uri: `${appUrl}auth/signinsilent/${providerId}`
   };
   // popupWindowFeatures?: string;
   // silentRequestTimeout?: any;
@@ -169,7 +200,8 @@ export function createOidcAuth(
         return;
       }
     }
-    window.location = baseUrl;
+    //   window.location.reload(true);
+    if (appUrl) window.location = appUrl;
   }
 
   let _inited = false;
@@ -245,22 +277,22 @@ export function createOidcAuth(
       createCallbackRoutes(router) {
         return [
           {
-            path: `/auth/${providerId}/signinwin`,
+            path: `/auth/signinwin/${providerId}`,
             name: 'signinwin',
             component: createSignInCallbackComponent(router, SignInType.Window)
           },
           {
-            path: `/auth/${providerId}/signinpop`,
+            path: `/auth/signinpop/${providerId}`,
             name: 'signinpop',
             component: createSignInCallbackComponent(router, SignInType.Popup)
           },
           {
-            path: `/auth/${providerId}/signinsilent`,
+            path: `/auth/signinsilent/${providerId}`,
             name: 'signinsilent',
             component: createSignInCallbackComponent(router, SignInType.Silent)
           },
           {
-            path: `/auth/${providerId}/signout`,
+            path: `/auth/signoutpop/${providerId}`,
             name: 'signout',
             component: Vue.extend({
               render: h => h('div'),

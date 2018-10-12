@@ -1,7 +1,7 @@
 <template>
   <div class="about">
     <h1>This is a login-protected page</h1>
-    <ul>
+    <ul class="claims">
       <li v-for="c in claims"
           :key="c.key">
         <strong>{{c.key}}</strong>: {{c.value}}</li>
@@ -27,7 +27,7 @@ export default {
 };
 </script>
 <style>
-ul {
+.claims {
   list-style: none;
   text-align: left;
 }
