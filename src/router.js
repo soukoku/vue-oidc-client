@@ -17,7 +17,7 @@ const router = new Router({
       path: '/about',
       name: 'about',
       meta: {
-        authName: mainAuth.name
+        authName: mainAuth.authName
       },
       // route level code-splitting
       // this generates a separate chunk (about.[hash].js) for this route
@@ -28,7 +28,6 @@ const router = new Router({
   ]
 });
 
-router.beforeEach(mainAuth.createNavigationGuard());
-router.addRoutes(mainAuth.createCallbackRoutes(router));
+mainAuth.useRouter(router);
 
 export default router;

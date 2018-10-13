@@ -66,11 +66,7 @@ export function createOidcAuth(
   const config = {
     response_type: `id_token`,
     scope: `openid profile`,
-    filterProtocolClaims: true,
-    loadUserInfo: true,
-    // popupWindowTarget: providerId,
     automaticSilentRenew: true,
-    monitorSession: true, // iframeNavigator?: any;
     userStore: new WebStorageStateStore({
       store: localStorage
     }),
@@ -116,32 +112,12 @@ export function createOidcAuth(
   });
 
   mgr.events.addUserUnloaded(() => {
-    auth.user = null;
+    auth.user = undefined;
   });
 
   mgr.events.addUserSignedOut(() => {
-    auth.user = null;
+    auth.user = undefined;
   });
-
-  //   handleSignIn() {
-  //     if (window.location.href.match(/silent/i)) {
-  //       handleSignInCalback(SignInType.Silent);
-  //     } else if (window.location.href.match(/popup/i)) {
-  //       handleSignInCalback(SignInType.Popup);
-  //     } else {
-  //       handleSignInCalback(SignInType.Window).then(data => {
-  //         // need to manually redirect for window type
-  //         // goto original secure route or root
-  //         let redirect = data.state ? data.state.to : null;
-  //         if (redirect && redirect.fullPath) {
-  //           redirect = redirect.fullPath;
-  //         } else {
-  //           redirect = '/';
-  //         }
-  //         window.location.replace(redirect);
-  //       });
-  //     }
-  //   },
 
   function signIn(type, args) {
     switch (type) {
@@ -176,7 +152,8 @@ export function createOidcAuth(
             if (type === SignInType.Window) {
               // goto original secure route or root
               const redirect = data.state ? data.state.to : null;
-              router.replace(redirect || '/');
+              if (router) router.replace(redirect || '/');
+              else window.location = appUrl;
             }
           })
           .catch(err => {
@@ -185,7 +162,8 @@ export function createOidcAuth(
               err
             );
             if (type === SignInType.Window) {
-              router.replace('/');
+              if (router) router.replace('/');
+              else window.location = appUrl;
             }
           });
       }
@@ -207,28 +185,23 @@ export function createOidcAuth(
   let _inited = false;
   const auth = new Vue({
     data() {
-      return { user: null };
+      return { user: undefined };
     },
     computed: {
-      name() {
+      authName() {
         return providerId;
       },
       isAuthenticated() {
         return !!this.user && !this.user.expired;
       },
       accessToken() {
-        return !!this.user && !this.user.expired
-          ? this.user.access_token
-          : null;
+        return !!this.user && !this.user.expired ? this.user.access_token : '';
       },
       userProfile() {
         return !!this.user && !this.user.expired ? this.user.profile : {};
       }
     },
     methods: {
-      install() {
-        Vue.prototype.$oidc = this;
-      },
       startup() {
         if (_inited) {
           return Promise.resolve();
@@ -241,7 +214,7 @@ export function createOidcAuth(
               if (test && !test.expired) {
                 this.user = test;
               } else {
-                mgr.removeUser();
+                // mgr.removeUser();
                 // return mgr.signinSilent();
                 // return this.signIn(defaultSignInType);
               }
@@ -252,9 +225,11 @@ export function createOidcAuth(
             });
         }
       },
-      createNavigationGuard() {
+      useRouter(router) {
         const guard = (to, from, next) => {
-          if (to.matched.some(record => record.meta.authName === this.name)) {
+          if (
+            to.matched.some(record => record.meta.authName === this.authName)
+          ) {
             if (this.isAuthenticated) {
               next();
             } else {
@@ -272,10 +247,9 @@ export function createOidcAuth(
             next();
           }
         };
-        return guard;
-      },
-      createCallbackRoutes(router) {
-        return [
+        router.beforeEach(guard);
+
+        router.addRoutes([
           {
             path: `/auth/signinwin/${providerId}`,
             name: 'signinwin',
@@ -303,7 +277,7 @@ export function createOidcAuth(
               }
             })
           }
-        ];
+        ]);
       },
       signIn(args) {
         return signIn(defaultSignInType, args);
