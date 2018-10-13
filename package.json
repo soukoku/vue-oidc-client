@@ -1,7 +1,7 @@
 {
   "name": "vue-oidc-client",
   "version": "0.1.0",
-  "description": "Vue wrapper for oidc-client",
+  "description": "Wrapper around oidc-client-js to work in a vue application",
   "author": "Eugene Wang",
   "license": "MIT",
   "main": "src/VueOidcAuth.js",
@@ -25,7 +25,7 @@
   },
   "homepage": "https://github.com/soukoku/vue-oidc-client",
   "scripts": {
-    "serve": "cd sample && vue-cli-service serve",
+    "serve": "cd sample && yarn && vue-cli-service serve",
     "build": "vue-cli-service build --target lib --name VueOidcAuth src/VueOidcAuth.js",
     "lint": "vue-cli-service lint"
   },

@@ -1,26 +1,36 @@
 # vue-oidc-client
 
-## Project setup
-```
-yarn install
+This is a wrapper around [oidc-client-js](https://github.com/IdentityModel/oidc-client-js) to work in a vue application.
+
+## Installs
+
+### NPM
+
+```bash
+npm install vue-oidc-client
 ```
 
-### Compiles and hot-reloads for development
-```
-yarn run serve
+### Yarn
+
+```bash
+yarn add vue-oidc-client
 ```
 
-### Compiles and minifies for production
-```
-yarn run build
+### Browser
+
+to be added...
+
+## Getting the Source
+
+```bash
+git clone https://github.com/soukoku/vue-oidc-client.git
+cd vue-oidc-client
 ```
 
-### Run your tests
-```
-yarn run test
+### Running the sample
+
+```bash
+yarn serve
 ```
 
-### Lints and fixes files
-```
-yarn run lint
-```
+and then browse to [http://localhost:8080](http://localhost:8080).
