@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { createOidcAuth, SignInType } from '@/lib/VueOidcAuth';
+import { createOidcAuth, SignInType } from 'vue-oidc-client';
 
 const loco = window.location;
 const appRootUrl = `${loco.protocol}//${loco.host}${process.env.BASE_URL}`;

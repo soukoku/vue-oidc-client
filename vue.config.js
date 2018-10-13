@@ -1,9 +1,9 @@
 module.exports = {
   productionSourceMap: false,
-  css: { extract: false },
-  devServer: {
-    https: true
-  }
+  css: { extract: false }
+  // devServer: {
+  //   https: true
+  // }
   //   configureWebpack: {
   //       output: {
   //           libraryExport: 'default'
