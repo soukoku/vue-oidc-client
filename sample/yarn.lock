@@ -1407,7 +1407,7 @@ babel-plugin-transform-vue-jsx@^4.0.1:
   dependencies:
     esutils "^2.0.2"
 
-babel-polyfill@^6.26.0:
+babel-polyfill@>=6.9.1, babel-polyfill@^6.26.0:
   version "6.26.0"
   resolved "https://registry.yarnpkg.com/babel-polyfill/-/babel-polyfill-6.26.0.tgz#379937abc67d7895970adc621f284cd966cf2153"
   integrity sha1-N5k3q8Z9eJWXCtxiHyhM2WbPIVM=
@@ -4586,6 +4586,11 @@ jsprim@^1.2.2:
     json-schema "0.2.3"
     verror "1.10.0"
 
+jsrsasign@^8.0.12:
+  version "8.0.12"
+  resolved "https://registry.yarnpkg.com/jsrsasign/-/jsrsasign-8.0.12.tgz#22abb9656d34a30b9530436720835e89c2e5c316"
+  integrity sha1-Iqu5ZW00owuVMENnIINeicLlwxY=
+
 killable@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/killable/-/killable-1.0.1.tgz#4c8ce441187a061c7474fb87ca08e2a638194892"
@@ -5451,6 +5456,15 @@ obuf@^1.0.0, obuf@^1.1.1:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/obuf/-/obuf-1.1.2.tgz#09bea3343d41859ebd446292d11c9d4db619084e"
   integrity sha512-PX1wu0AmAdPqOL1mWhqmlOd8kOIZQwGZw6rh7uby9fTc5lhaOWFLX3I6R1hrF9k3zUY40e6igsLGkDXK92LJNg==
+
+oidc-client@^1.5.3-beta.1:
+  version "1.5.3-beta.1"
+  resolved "https://registry.yarnpkg.com/oidc-client/-/oidc-client-1.5.3-beta.1.tgz#c1e1d23a89cfa7531a320a443ec1dc6eb534c3b2"
+  integrity sha512-p4EcEuMuVV2mwcH59BSNE/0zNalksELSpOp/r7oH4vGppIwsE1cHvXhHqc4hX7jpfrxU7wYsEZ74ECNXXnZB5g==
+  dependencies:
+    jsrsasign "^8.0.12"
+  optionalDependencies:
+    babel-polyfill ">=6.9.1"
 
 on-finished@~2.3.0:
   version "2.3.0"
@@ -7757,6 +7771,13 @@ vue-loader@^15.4.2:
     loader-utils "^1.1.0"
     vue-hot-reload-api "^2.3.0"
     vue-style-loader "^4.1.0"
+
+vue-oidc-client@:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/vue-oidc-client/-/vue-oidc-client-0.1.0.tgz#ff25cfa00c5b7730e360c248d270615ebcaa008f"
+  integrity sha512-0s4ZhxJ5nP+pTa28zSv6wrNyG/O0vUObPK1FXg2k+C4JA69vdPq0ehYUcXRnZ6lIqNamwDA4jAcA2ki0sFslzg==
+  dependencies:
+    oidc-client "^1.5.3-beta.1"
 
 vue-router@^3.0.1:
   version "3.0.1"
