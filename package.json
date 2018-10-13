@@ -1,18 +1,40 @@
 {
   "name": "vue-oidc-client",
   "version": "0.1.0",
-  "private": true,
+  "description": "Vue wrapper for oidc-client",
+  "author": "Yin-Chun Wang",
+  "license": "MIT",
+  "main": "src/lib/VueOidcAuth.js",
+  "typings": "typings/index.d.ts",
+  "files": [
+    "src/lib/*.js",
+    "typings/*.d.ts"
+  ],
+  "keywords": [
+    "vue",
+    "openid",
+    "oidc"
+  ],
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/soukoku/vue-oidc-client.git"
+  },
+  "bugs": {
+    "url": "https://github.com/soukoku/vue-oidc-client/issues"
+  },
+  "homepage": "https://github.com/soukoku/vue-oidc-client",
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "build": "vue-cli-service build --target lib --name vueOidcAuth src/lib/VueOidcAuth.js",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "oidc-client": "^1.5.3-beta.1",
-    "vue": "^2.5.17",
-    "vue-router": "^3.0.1"
+    "oidc-client": "^1.5.3-beta.1"
   },
   "devDependencies": {
+    "vue": "^2.5.17",
+    "vue-router": "^3.0.1",
     "babel-polyfill": "^6.26.0",
     "@vue/cli-plugin-babel": "^3.0.5",
     "@vue/cli-plugin-eslint": "^3.0.5",

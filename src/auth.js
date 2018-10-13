@@ -4,7 +4,7 @@ import { createOidcAuth, SignInType } from '@/lib/VueOidcAuth';
 const loco = window.location;
 const appRootUrl = `${loco.protocol}//${loco.host}${process.env.BASE_URL}`;
 
-var mainOidc = createOidcAuth(SignInType.Popup, {
+var mainOidc = createOidcAuth(SignInType.Window, {
   authority: 'https://demo.identityserver.io/',
   client_id: 'implicit', // 'implicit.shortlived',
   response_type: 'id_token token',
