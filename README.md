@@ -18,6 +18,10 @@ yarn add vue-oidc-client
 
 ### Browser
 
+Copy the compiled UMD version in the `dist` folder to your project and reference it in a script tag.
+
+## Usage
+
 to be added...
 
 ## Getting the Source

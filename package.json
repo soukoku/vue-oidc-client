@@ -12,8 +12,9 @@
   ],
   "keywords": [
     "vue",
-    "openid",
-    "oidc"
+    "openid-connect",
+    "oidc",
+    "oidc-client"
   ],
   "sideEffects": false,
   "repository": {
