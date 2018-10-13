@@ -7,6 +7,7 @@
   "main": "src/VueOidcAuth.js",
   "typings": "typings/index.d.ts",
   "files": [
+    "dist/*.js",
     "src/*.js",
     "typings/*.d.ts"
   ],
