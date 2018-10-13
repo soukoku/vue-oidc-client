@@ -30,7 +30,7 @@ export enum SignInType {
 export function createOidcAuth(
   defaultSignInType: SignInType,
   oidcConfig: UserManagerSettings,
-  logger: Logger
+  logger?: Logger
 ): OidcAuth;
 
 /**
@@ -61,12 +61,13 @@ export interface OidcAuth {
   startup(): Promise<any>;
   /**
    * Hookup this auth instance with a vue-router instance.
-   * This will guard routes with meta: { authName: `name of this auth` }.
+   * This will guard routes with meta: { authName: `name of this auth` }
+   * and register redirect callback routes.
    * @param router - the vue router instance.
    */
   useRouter(router: VueRouter): void;
   /**
-   * Starts the login flow.
+   * Starts the login flow explicitly.
    * @param args
    */
   signIn(args?: any): Promise<any>;

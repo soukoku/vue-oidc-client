@@ -1,10 +1,12 @@
 {
   "name": "vue-oidc-client",
-  "version": "0.1.0",
-  "description": "Wrapper around oidc-client-js to work in a vue application",
+  "version": "0.1.1",
+  "description": "Wrapper around oidc-client-js to to better work in a vue application.",
   "author": "Eugene Wang",
   "license": "MIT",
   "main": "src/VueOidcAuth.js",
+  "unpkg": "dist/VueOidcAuth.umd.js",
+  "jsdelivr": "dist/VueOidcAuth.umd.js",
   "typings": "typings/index.d.ts",
   "files": [
     "dist/*.js",
