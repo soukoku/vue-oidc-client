@@ -30,7 +30,7 @@ export enum SignInType {
 export function createOidcAuth(
   defaultSignInType: SignInType,
   oidcConfig: UserManagerSettings,
-  logger: Logger = console
+  logger: Logger
 ): OidcAuth;
 
 /**

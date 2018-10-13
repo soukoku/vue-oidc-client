@@ -7,12 +7,12 @@ import { OidcAuth } from './index';
 
 declare module 'vue/types/vue' {
   interface Vue {
-    $auth: OidcAuth;
+    $oidc: OidcAuth;
   }
 }
 
 declare module 'vue/types/options' {
   interface ComponentOptions<V extends Vue> {
-    auth?: OidcAuth;
+    oidc?: OidcAuth;
   }
 }
