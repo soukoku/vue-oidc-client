@@ -1505,66 +1505,59 @@ var SignInType = {
    */
   2: 'Silent'
 };
-/**
- * Creates an openid-connect auth instance.
- * @param {SignInType} defaultSignInType - signin method to use when signIn()/signOut() are called.
- * @param {Object} oidcConfig - config object for oidc-client.
- * @param {Object} logger
- */
 
-function createOidcAuth(defaultSignInType, oidcConfig) {
-  var logger = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : console;
+function createOidcAuth(_authName, defaultSignInType, appBaseUrl, oidcConfig) {
+  var logger = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : console;
+
+  if (!_authName) {
+    throw new Error('Auth name is required.');
+  }
 
   if (defaultSignInType !== SignInType.Window && defaultSignInType !== SignInType.Popup) {
     throw new Error('Only window or popup are valid default signin types.');
+  }
+
+  if (!appBaseUrl) {
+    throw new Error('App base url is required.');
   }
 
   if (!oidcConfig) {
     throw new Error('No config provided to oidc auth.');
   }
 
-  var providerId = oidcConfig.client_id;
-  var appUrl = oidcConfig.post_logout_redirect_uri;
-
-  if (!appUrl) {
-    throw new Error('post_logout_redirect_uri is required.');
-  }
-
-  oidc_client_min["Log"].logger = logger; // merge overrides with defaults
+  oidc_client_min["Log"].logger = logger; // merge config with defaults
 
   var config = _objectSpread({
-    response_type: "id_token",
-    scope: "openid profile",
+    response_type: 'id_token',
+    scope: 'openid profile',
     automaticSilentRenew: true,
     userStore: new oidc_client_min["WebStorageStateStore"]({
       store: localStorage
-    })
+    }),
+    post_logout_redirect_uri: appBaseUrl
   }, oidcConfig, {
-    // fixed paths
-    redirect_uri: "".concat(appUrl, "auth/signinwin/").concat(providerId),
-    popup_post_logout_redirect_uri: "".concat(appUrl, "auth/signoutpop/").concat(providerId),
-    popup_redirect_uri: "".concat(appUrl, "auth/signinpop/").concat(providerId),
-    silent_redirect_uri: "".concat(appUrl, "auth/signinsilent/").concat(providerId)
-  }); // popupWindowFeatures?: string;
-  // silentRequestTimeout?: any;
+    // all properties after this are not user configurable
+    redirect_uri: "".concat(appBaseUrl, "auth/signinwin/").concat(_authName),
+    popup_post_logout_redirect_uri: "".concat(appBaseUrl, "auth/signoutpop/").concat(_authName),
+    popup_redirect_uri: "".concat(appBaseUrl, "auth/signinpop/").concat(_authName),
+    silent_redirect_uri: "".concat(appBaseUrl, "auth/signinsilent/").concat(_authName)
+  });
 
-
-  oidc_client_min["Log"].debug("Creating new oidc auth for ".concat(providerId)); //   Log.debug(JSON.stringify(config));
-
+  oidc_client_min["Log"].debug("Creating new oidc auth for ".concat(_authName));
   var mgr = new oidc_client_min["UserManager"](config); ///////////////////////////////
   // events
   ///////////////////////////////
 
   mgr.events.addAccessTokenExpiring(function () {
-    oidc_client_min["Log"].debug("".concat(providerId, " token expiring"));
+    oidc_client_min["Log"].debug("".concat(_authName, " token expiring"));
   });
   mgr.events.addAccessTokenExpired(function () {
-    oidc_client_min["Log"].debug("".concat(providerId, " token expired")); // TODO: try silent before full sign out?
+    oidc_client_min["Log"].debug("".concat(_authName, " token expired")); // TODO: try silent before full sign out?
 
     auth.signOut();
   });
   mgr.events.addSilentRenewError(function (e) {
-    oidc_client_min["Log"].error("".concat(providerId, " silent renew error"), e.message); // TODO: need to restart renew manually?
+    oidc_client_min["Log"].error("".concat(_authName, " silent renew error"), e.message); // TODO: need to restart renew manually?
 
     if (auth.isAuthenticated) {
       setTimeout(function () {
@@ -1613,18 +1606,18 @@ function createOidcAuth(defaultSignInType, oidcConfig) {
       },
       created: function created() {
         handleSignInCalback(type).then(function (data) {
-          oidc_client_min["Log"].debug("".concat(providerId, " ").concat(SignInType[type], " signin callback success"), data); // need to manually redirect for window type
+          oidc_client_min["Log"].debug("".concat(_authName, " ").concat(SignInType[type], " signin callback success"), data); // need to manually redirect for window type
 
           if (type === SignInType.Window) {
             // goto original secure route or root
             var redirect = data.state ? data.state.to : null;
-            if (router) router.replace(redirect || '/');else window.location = appUrl;
+            if (router) router.replace(redirect || '/');else window.location = appBaseUrl;
           }
         }).catch(function (err) {
-          oidc_client_min["Log"].error("".concat(providerId, " ").concat(SignInType[type], " signin callback error"), err);
+          oidc_client_min["Log"].error("".concat(_authName, " ").concat(SignInType[type], " signin callback error"), err);
 
           if (type === SignInType.Window) {
-            if (router) router.replace('/');else window.location = appUrl;
+            if (router) router.replace('/');else window.location = appBaseUrl;
           }
         });
       }
@@ -1635,14 +1628,14 @@ function createOidcAuth(defaultSignInType, oidcConfig) {
     if (router) {
       var current = router.currentRoute;
 
-      if (current && current.meta.authName === providerId) {
+      if (current && current.meta.authName === _authName) {
         router.replace('/');
         return;
       }
     } //   window.location.reload(true);
 
 
-    if (appUrl) window.location = appUrl;
+    if (appBaseUrl) window.location = appBaseUrl;
   }
 
   var _inited = false;
@@ -1654,7 +1647,7 @@ function createOidcAuth(defaultSignInType, oidcConfig) {
     },
     computed: {
       authName: function authName() {
-        return providerId;
+        return _authName;
       },
       isAuthenticated: function isAuthenticated() {
         return !!this.user && !this.user.expired;
@@ -1679,12 +1672,9 @@ function createOidcAuth(defaultSignInType, oidcConfig) {
 
             if (test && !test.expired) {
               _this.user = test;
-            } else {// mgr.removeUser();
-              // return mgr.signinSilent();
-              // return this.signIn(defaultSignInType);
             }
-          }).catch(function () {// silent
-            // Log.error(`Auth startup err = ` + err);
+          }).catch(function (err) {
+            oidc_client_min["Log"].warn("Auth startup err = ".concat(err));
           });
         }
       },
@@ -1719,19 +1709,19 @@ function createOidcAuth(defaultSignInType, oidcConfig) {
 
         router.beforeEach(guard);
         router.addRoutes([{
-          path: "/auth/signinwin/".concat(providerId),
+          path: "/auth/signinwin/".concat(_authName),
           name: 'signinwin',
           component: createSignInCallbackComponent(router, SignInType.Window)
         }, {
-          path: "/auth/signinpop/".concat(providerId),
+          path: "/auth/signinpop/".concat(_authName),
           name: 'signinpop',
           component: createSignInCallbackComponent(router, SignInType.Popup)
         }, {
-          path: "/auth/signinsilent/".concat(providerId),
+          path: "/auth/signinsilent/".concat(_authName),
           name: 'signinsilent',
           component: createSignInCallbackComponent(router, SignInType.Silent)
         }, {
-          path: "/auth/signoutpop/".concat(providerId),
+          path: "/auth/signoutpop/".concat(_authName),
           name: 'signout',
           component: external_commonjs_vue_commonjs2_vue_root_Vue_default.a.extend({
             render: function render(h) {
@@ -1763,6 +1753,8 @@ function createOidcAuth(defaultSignInType, oidcConfig) {
   });
   return auth;
 }
+
+
 // CONCATENATED MODULE: ./node_modules/@vue/cli-service/lib/commands/build/entry-lib-no-default.js
 /* concated harmony reexport SignInType */__webpack_require__.d(__webpack_exports__, "SignInType", function() { return SignInType; });
 /* concated harmony reexport createOidcAuth */__webpack_require__.d(__webpack_exports__, "createOidcAuth", function() { return createOidcAuth; });
@@ -1773,3 +1765,4 @@ function createOidcAuth(defaultSignInType, oidcConfig) {
 /***/ })
 
 /******/ });
+//# sourceMappingURL=VueOidcAuth.common.js.map

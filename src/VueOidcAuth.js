@@ -33,54 +33,48 @@ export const SignInType = {
   2: 'Silent'
 };
 
-/**
- * Creates an openid-connect auth instance.
- * @param {SignInType} defaultSignInType - signin method to use when signIn()/signOut() are called.
- * @param {Object} oidcConfig - config object for oidc-client.
- * @param {Object} logger
- */
 export function createOidcAuth(
+  authName,
   defaultSignInType,
+  appBaseUrl,
   oidcConfig,
   logger = console
 ) {
+  if (!authName) {
+    throw new Error('Auth name is required.');
+  }
   if (
     defaultSignInType !== SignInType.Window &&
     defaultSignInType !== SignInType.Popup
   ) {
     throw new Error('Only window or popup are valid default signin types.');
   }
+  if (!appBaseUrl) {
+    throw new Error('App base url is required.');
+  }
   if (!oidcConfig) {
     throw new Error('No config provided to oidc auth.');
   }
 
-  const providerId = oidcConfig.client_id;
-  const appUrl = oidcConfig.post_logout_redirect_uri;
-  if (!appUrl) {
-    throw new Error('post_logout_redirect_uri is required.');
-  }
-
   Log.logger = logger;
 
-  // merge overrides with defaults
+  // merge config with defaults
   const config = {
-    response_type: `id_token`,
-    scope: `openid profile`,
+    response_type: 'id_token',
+    scope: 'openid profile',
     automaticSilentRenew: true,
     userStore: new WebStorageStateStore({
       store: localStorage
     }),
-    ...oidcConfig, // fixed paths
-    redirect_uri: `${appUrl}auth/signinwin/${providerId}`,
-    popup_post_logout_redirect_uri: `${appUrl}auth/signoutpop/${providerId}`,
-    popup_redirect_uri: `${appUrl}auth/signinpop/${providerId}`,
-    silent_redirect_uri: `${appUrl}auth/signinsilent/${providerId}`
+    post_logout_redirect_uri: appBaseUrl,
+    ...oidcConfig, // all properties after this are not user configurable
+    redirect_uri: `${appBaseUrl}auth/signinwin/${authName}`,
+    popup_post_logout_redirect_uri: `${appBaseUrl}auth/signoutpop/${authName}`,
+    popup_redirect_uri: `${appBaseUrl}auth/signinpop/${authName}`,
+    silent_redirect_uri: `${appBaseUrl}auth/signinsilent/${authName}`
   };
-  // popupWindowFeatures?: string;
-  // silentRequestTimeout?: any;
 
-  Log.debug(`Creating new oidc auth for ${providerId}`);
-  //   Log.debug(JSON.stringify(config));
+  Log.debug(`Creating new oidc auth for ${authName}`);
 
   const mgr = new UserManager(config);
 
@@ -88,17 +82,17 @@ export function createOidcAuth(
   // events
   ///////////////////////////////
   mgr.events.addAccessTokenExpiring(() => {
-    Log.debug(`${providerId} token expiring`);
+    Log.debug(`${authName} token expiring`);
   });
 
   mgr.events.addAccessTokenExpired(() => {
-    Log.debug(`${providerId} token expired`);
+    Log.debug(`${authName} token expired`);
     // TODO: try silent before full sign out?
     auth.signOut();
   });
 
   mgr.events.addSilentRenewError(e => {
-    Log.error(`${providerId} silent renew error`, e.message);
+    Log.error(`${authName} silent renew error`, e.message);
     // TODO: need to restart renew manually?
     if (auth.isAuthenticated) {
       setTimeout(() => {
@@ -145,7 +139,7 @@ export function createOidcAuth(
         handleSignInCalback(type)
           .then(data => {
             Log.debug(
-              `${providerId} ${SignInType[type]} signin callback success`,
+              `${authName} ${SignInType[type]} signin callback success`,
               data
             );
             // need to manually redirect for window type
@@ -153,17 +147,17 @@ export function createOidcAuth(
               // goto original secure route or root
               const redirect = data.state ? data.state.to : null;
               if (router) router.replace(redirect || '/');
-              else window.location = appUrl;
+              else window.location = appBaseUrl;
             }
           })
           .catch(err => {
             Log.error(
-              `${providerId} ${SignInType[type]} signin callback error`,
+              `${authName} ${SignInType[type]} signin callback error`,
               err
             );
             if (type === SignInType.Window) {
               if (router) router.replace('/');
-              else window.location = appUrl;
+              else window.location = appBaseUrl;
             }
           });
       }
@@ -173,13 +167,13 @@ export function createOidcAuth(
   function redirectAfterSignout(router) {
     if (router) {
       const current = router.currentRoute;
-      if (current && current.meta.authName === providerId) {
+      if (current && current.meta.authName === authName) {
         router.replace('/');
         return;
       }
     }
     //   window.location.reload(true);
-    if (appUrl) window.location = appUrl;
+    if (appBaseUrl) window.location = appBaseUrl;
   }
 
   let _inited = false;
@@ -189,7 +183,7 @@ export function createOidcAuth(
     },
     computed: {
       authName() {
-        return providerId;
+        return authName;
       },
       isAuthenticated() {
         return !!this.user && !this.user.expired;
@@ -213,15 +207,10 @@ export function createOidcAuth(
               _inited = true;
               if (test && !test.expired) {
                 this.user = test;
-              } else {
-                // mgr.removeUser();
-                // return mgr.signinSilent();
-                // return this.signIn(defaultSignInType);
               }
             })
-            .catch(() => {
-              // silent
-              // Log.error(`Auth startup err = ` + err);
+            .catch(err => {
+              Log.warn(`Auth startup err = ${err}`);
             });
         }
       },
@@ -251,22 +240,22 @@ export function createOidcAuth(
 
         router.addRoutes([
           {
-            path: `/auth/signinwin/${providerId}`,
+            path: `/auth/signinwin/${authName}`,
             name: 'signinwin',
             component: createSignInCallbackComponent(router, SignInType.Window)
           },
           {
-            path: `/auth/signinpop/${providerId}`,
+            path: `/auth/signinpop/${authName}`,
             name: 'signinpop',
             component: createSignInCallbackComponent(router, SignInType.Popup)
           },
           {
-            path: `/auth/signinsilent/${providerId}`,
+            path: `/auth/signinsilent/${authName}`,
             name: 'signinsilent',
             component: createSignInCallbackComponent(router, SignInType.Silent)
           },
           {
-            path: `/auth/signoutpop/${providerId}`,
+            path: `/auth/signoutpop/${authName}`,
             name: 'signout',
             component: Vue.extend({
               render: h => h('div'),

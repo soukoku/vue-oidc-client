@@ -1,7 +1,7 @@
 # vue-oidc-client
 
 This is a wrapper around [oidc-client-js](https://github.com/IdentityModel/oidc-client-js)
-to better work in a vue application.
+to better work in a vue application with router integration.
 
 ## Installs
 

@@ -23,12 +23,16 @@ export enum SignInType {
 
 /**
  * Creates an openid-connect auth instance.
- * @param defaultSignInType - the signin method to use when signIn()/signOut() are called.
+ * @param authName - short name (no spaces) that identifies the auth instance for routing purposes.
+ * @param defaultSignInType - the signin method to use when `signIn()` and `signOut()` are called.
+ * @param appBaseUrl - url to the app using this instance for routing purposes. Something like `https://domain/app/`.
  * @param oidcConfig - config object for oidc-client.
  * @param logger - logger used by oidc-client. Defaults to console.
  */
 export function createOidcAuth(
+  authName: string,
   defaultSignInType: SignInType,
+  appBaseUrl: string,
   oidcConfig: UserManagerSettings,
   logger?: Logger
 ): OidcAuth;
