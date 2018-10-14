@@ -77,8 +77,7 @@ export interface OidcAuth {
   signIn(args?: any): Promise<any>;
   /**
    * Starts the logout flow.
-   * @param router - a vue router instance.
    * @param args
    */
-  signOut(router: VueRouter, args?: any): Promise<any>;
+  signOut(args?: any): Promise<any>;
 }

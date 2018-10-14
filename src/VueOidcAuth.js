@@ -215,6 +215,7 @@ export function createOidcAuth(
         }
       },
       useRouter(router) {
+        this.myRouter = router;
         const guard = (to, from, next) => {
           if (
             to.matched.some(record => record.meta.authName === this.authName)
@@ -271,8 +272,9 @@ export function createOidcAuth(
       signIn(args) {
         return signIn(defaultSignInType, args);
       },
-      signOut(router, args) {
+      signOut(args) {
         if (defaultSignInType === SignInType.Popup) {
+          const router = this.myRouter;
           return mgr
             .signoutPopup(args)
             .then(() => {

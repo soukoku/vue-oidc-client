@@ -1681,6 +1681,8 @@ function createOidcAuth(_authName, defaultSignInType, appBaseUrl, oidcConfig) {
       useRouter: function useRouter(router) {
         var _this2 = this;
 
+        this.myRouter = router;
+
         var guard = function guard(to, from, next) {
           if (to.matched.some(function (record) {
             return record.meta.authName === _this2.authName;
@@ -1737,8 +1739,9 @@ function createOidcAuth(_authName, defaultSignInType, appBaseUrl, oidcConfig) {
       signIn: function signIn(args) {
         return _signIn(defaultSignInType, args);
       },
-      signOut: function signOut(router, args) {
+      signOut: function signOut(args) {
         if (defaultSignInType === SignInType.Popup) {
+          var router = this.myRouter;
           return mgr.signoutPopup(args).then(function () {
             redirectAfterSignout(router);
           }).catch(function () {
