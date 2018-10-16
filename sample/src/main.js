@@ -7,9 +7,11 @@ import router from './router';
 
 Vue.config.productionTip = false;
 
-mainAuth.startup().then(() => {
-  new Vue({
-    router,
-    render: h => h(App)
-  }).$mount('#app');
+mainAuth.startup().then(ok => {
+  if (ok) {
+    new Vue({
+      router,
+      render: h => h(App)
+    }).$mount('#app');
+  }
 });

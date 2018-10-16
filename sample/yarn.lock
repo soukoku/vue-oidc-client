@@ -6719,7 +6719,7 @@ vue-loader@^15.4.2:
     vue-hot-reload-api "^2.3.0"
     vue-style-loader "^4.1.0"
 
-vue-oidc-client@0.2.1:
+vue-oidc-client@latest:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/vue-oidc-client/-/vue-oidc-client-0.2.1.tgz#b15c89583f15a912173459dafe3f47fcc285a214"
   dependencies:
