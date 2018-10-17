@@ -6,7 +6,7 @@ const appRootUrl = `${loco.protocol}//${loco.host}${process.env.BASE_URL}`;
 
 var mainOidc = createOidcAuth('main', SignInType.Popup, appRootUrl, {
   authority: 'https://demo.identityserver.io/',
-  client_id: 'implicit', // 'implicit.shortlived',
+  client_id: 'implicit.shortlived', // 'implicit.shortlived',
   response_type: 'id_token token',
   scope: 'openid profile email api',
   // test use

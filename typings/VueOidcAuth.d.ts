@@ -25,14 +25,14 @@ export enum SignInType {
  * Creates an openid-connect auth instance.
  * @param authName - short name (no spaces) that identifies the auth instance for routing purposes.
  * @param defaultSignInType - the signin method to use when `signIn()` and `signOut()` are called.
- * @param appBaseUrl - url to the app using this instance for routing purposes. Something like `https://domain/app/`.
+ * @param appUrl - url to the app using this instance for routing purposes. Something like `https://domain/app/`.
  * @param oidcConfig - config object for oidc-client.
  * @param logger - logger used by oidc-client. Defaults to console.
  */
 export function createOidcAuth(
   authName: string,
   defaultSignInType: SignInType,
-  appBaseUrl: string,
+  appUrl: string,
   oidcConfig: UserManagerSettings,
   logger?: Logger
 ): OidcAuth;
@@ -41,6 +41,10 @@ export function createOidcAuth(
  * A wrapper on oidc-client with vue support.
  */
 export interface OidcAuth {
+  /**
+   * Original app url used to create this instance.
+   */
+  readonly appUrl: string;
   /**
    * Name of this oidc authentication instance.
    * Use in a route's meta:{authName} property to protect that route.

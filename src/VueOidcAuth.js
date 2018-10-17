@@ -36,7 +36,7 @@ export const SignInType = {
 export function createOidcAuth(
   authName,
   defaultSignInType,
-  appBaseUrl,
+  appUrl,
   oidcConfig,
   logger = console
 ) {
@@ -49,7 +49,7 @@ export function createOidcAuth(
   ) {
     throw new Error('Only window or popup are valid default signin types.');
   }
-  if (!appBaseUrl) {
+  if (!appUrl) {
     throw new Error('App base url is required.');
   }
   if (!oidcConfig) {
@@ -66,15 +66,15 @@ export function createOidcAuth(
     userStore: new WebStorageStateStore({
       store: localStorage
     }),
-    post_logout_redirect_uri: appBaseUrl,
+    post_logout_redirect_uri: appUrl,
     ...oidcConfig, // all properties after this are not user configurable
-    redirect_uri: `${appBaseUrl}auth/signinwin/${authName}`,
-    popup_post_logout_redirect_uri: `${appBaseUrl}auth/signoutpop/${authName}`,
-    popup_redirect_uri: `${appBaseUrl}auth/signinpop/${authName}`,
-    silent_redirect_uri: `${appBaseUrl}auth/signinsilent/${authName}`
+    redirect_uri: `${appUrl}auth/signinwin/${authName}`,
+    popup_post_logout_redirect_uri: `${appUrl}auth/signoutpop/${authName}`,
+    popup_redirect_uri: `${appUrl}auth/signinpop/${authName}`,
+    silent_redirect_uri: `${appUrl}auth/signinsilent/${authName}`
   };
 
-  Log.debug(`Creating new oidc auth for ${authName}`);
+  Log.debug(`Creating new oidc auth as ${authName}`);
 
   const mgr = new UserManager(config);
 
@@ -82,23 +82,32 @@ export function createOidcAuth(
   // events
   ///////////////////////////////
   mgr.events.addAccessTokenExpiring(() => {
-    Log.debug(`${authName} token expiring`);
+    Log.debug(`${authName} auth token expiring`);
   });
 
   mgr.events.addAccessTokenExpired(() => {
-    Log.debug(`${authName} token expired`);
-    // TODO: try silent before full sign out?
-    auth.signOut();
+    Log.debug(`${authName} auth token expired`);
+    if (auth.isAuthenticated) {
+      mgr
+        .signinSilent()
+        .then(() => {
+          Log.debug(`${authName} auth silent renew after token expiration`);
+        })
+        .catch(() => {
+          Log.debug(`${authName} auth silent renew error token expiration`);
+          auth.signOut();
+        });
+    }
   });
 
   mgr.events.addSilentRenewError(e => {
-    Log.error(`${authName} silent renew error`, e.message);
+    Log.error(`${authName} auth silent renew error`, e.message);
     // TODO: need to restart renew manually?
-    //if (auth.isAuthenticated) {
-    //  setTimeout(() => {
-    //    mgr.signinSilent();
-    //  }, 5000);
-    //}
+    // if (auth.isAuthenticated) {
+    //   setTimeout(() => {
+    //     mgr.signinSilent();
+    //   }, 5000);
+    // }
   });
 
   mgr.events.addUserLoaded(user => {
@@ -107,9 +116,19 @@ export function createOidcAuth(
 
   mgr.events.addUserUnloaded(() => {
     auth.user = undefined;
+
+    // redirect if on protected route (best method here?)
+    Log.debug(`${authName} auth user unloaded`);
+    if (auth.myRouter) {
+      const current = auth.myRouter.currentRoute;
+      if (current && current.meta.authName === authName) {
+        auth.myRouter.replace('/');
+      }
+    }
   });
 
   mgr.events.addUserSignedOut(() => {
+    Log.debug(`${authName} auth user signed out`);
     auth.user = undefined;
   });
 
@@ -122,47 +141,6 @@ export function createOidcAuth(
     }
     return mgr.signinRedirect(args);
   }
-  // function handleSignInCalback(type, url) {
-  //   switch (type) {
-  //     case SignInType.Popup:
-  //       return mgr.signinPopupCallback(url);
-  //     case SignInType.Silent:
-  //       return mgr.signinSilentCallback(url);
-  //   }
-  //   return mgr.signinRedirectCallback(url);
-  // }
-
-  // function createSignInCallbackComponent(router, type) {
-  //   return {
-  //     render: h => h('div'),
-  //     created() {
-  //       handleSignInCalback(type)
-  //         .then(data => {
-  //           Log.debug(
-  //             `${authName} ${SignInType[type]} signin callback success`,
-  //             data
-  //           );
-  //           // need to manually redirect for window type
-  //           if (type === SignInType.Window) {
-  //             // goto original secure route or root
-  //             const redirect = data.state ? data.state.to : null;
-  //             if (router) router.replace(redirect || '/');
-  //             else window.location = appBaseUrl;
-  //           }
-  //         })
-  //         .catch(err => {
-  //           Log.error(
-  //             `${authName} ${SignInType[type]} signin callback error`,
-  //             err
-  //           );
-  //           if (type === SignInType.Window) {
-  //             if (router) router.replace('/');
-  //             else window.location = appBaseUrl;
-  //           }
-  //         });
-  //     }
-  //   };
-  // }
 
   function redirectAfterSignout(router) {
     if (router) {
@@ -173,7 +151,7 @@ export function createOidcAuth(
       }
     }
     //   window.location.reload(true);
-    if (appBaseUrl) window.location = appBaseUrl;
+    if (appUrl) window.location = appUrl;
   }
 
   let _inited = false;
@@ -182,6 +160,9 @@ export function createOidcAuth(
       return { user: undefined };
     },
     computed: {
+      appUrl() {
+        return appUrl;
+      },
       authName() {
         return authName;
       },
@@ -271,38 +252,16 @@ export function createOidcAuth(
                     // goto original secure route or root
                     const redirect = data.state ? data.state.to : null;
                     if (router) router.replace(redirect || '/');
-                    else window.location = appBaseUrl;
+                    else window.location = appUrl;
                   })
                   .catch(err => {
                     Log.error(`${authName} Window signin callback error`, err);
                     if (router) router.replace('/');
-                    else window.location = appBaseUrl;
+                    else window.location = appUrl;
                   });
               }
             }
           }
-          //{
-          //  path: `/auth/signinpop/${authName}`,
-          //  name: 'signinpop',
-          //  component: createSignInCallbackComponent(router, SignInType.Popup)
-          //},
-          //{
-          //  path: `/auth/signinsilent/${authName}`,
-          //  name: 'signinsilent',
-          //  component: createSignInCallbackComponent(router, SignInType.Silent)
-          //},
-          //{
-          //  path: `/auth/signoutpop/${authName}`,
-          //  name: 'signout',
-          //  component: Vue.extend({
-          //    render: h => h('div'),
-          //    created() {
-          //      if (defaultSignInType === SignInType.Popup)
-          //        return mgr.signoutPopupCallback(null, false);
-          //      return mgr.signoutRedirectCallback(null);
-          //    }
-          //  })
-          //}
         ]);
       },
       signIn(args) {
