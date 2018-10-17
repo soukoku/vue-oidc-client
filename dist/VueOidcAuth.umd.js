@@ -1515,7 +1515,7 @@ var SignInType = {
   2: 'Silent'
 };
 
-function createOidcAuth(_authName, defaultSignInType, appBaseUrl, oidcConfig) {
+function createOidcAuth(_authName, defaultSignInType, _appUrl, oidcConfig) {
   var logger = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : console;
 
   if (!_authName) {
@@ -1526,7 +1526,7 @@ function createOidcAuth(_authName, defaultSignInType, appBaseUrl, oidcConfig) {
     throw new Error('Only window or popup are valid default signin types.');
   }
 
-  if (!appBaseUrl) {
+  if (!_appUrl) {
     throw new Error('App base url is required.');
   }
 
@@ -1543,43 +1543,61 @@ function createOidcAuth(_authName, defaultSignInType, appBaseUrl, oidcConfig) {
     userStore: new oidc_client_min["WebStorageStateStore"]({
       store: localStorage
     }),
-    post_logout_redirect_uri: appBaseUrl
+    post_logout_redirect_uri: _appUrl
   }, oidcConfig, {
     // all properties after this are not user configurable
-    redirect_uri: "".concat(appBaseUrl, "auth/signinwin/").concat(_authName),
-    popup_post_logout_redirect_uri: "".concat(appBaseUrl, "auth/signoutpop/").concat(_authName),
-    popup_redirect_uri: "".concat(appBaseUrl, "auth/signinpop/").concat(_authName),
-    silent_redirect_uri: "".concat(appBaseUrl, "auth/signinsilent/").concat(_authName)
+    redirect_uri: "".concat(_appUrl, "auth/signinwin/").concat(_authName),
+    popup_post_logout_redirect_uri: "".concat(_appUrl, "auth/signoutpop/").concat(_authName),
+    popup_redirect_uri: "".concat(_appUrl, "auth/signinpop/").concat(_authName),
+    silent_redirect_uri: "".concat(_appUrl, "auth/signinsilent/").concat(_authName)
   });
 
-  oidc_client_min["Log"].debug("Creating new oidc auth for ".concat(_authName));
+  oidc_client_min["Log"].debug("Creating new oidc auth as ".concat(_authName));
   var mgr = new oidc_client_min["UserManager"](config); ///////////////////////////////
   // events
   ///////////////////////////////
 
   mgr.events.addAccessTokenExpiring(function () {
-    oidc_client_min["Log"].debug("".concat(_authName, " token expiring"));
+    oidc_client_min["Log"].debug("".concat(_authName, " auth token expiring"));
   });
   mgr.events.addAccessTokenExpired(function () {
-    oidc_client_min["Log"].debug("".concat(_authName, " token expired")); // TODO: try silent before full sign out?
+    oidc_client_min["Log"].debug("".concat(_authName, " auth token expired"));
 
-    auth.signOut();
+    if (auth.isAuthenticated) {
+      mgr.signinSilent().then(function () {
+        oidc_client_min["Log"].debug("".concat(_authName, " auth silent renew after token expiration"));
+      }).catch(function () {
+        oidc_client_min["Log"].debug("".concat(_authName, " auth silent renew error token expiration"));
+        auth.signOut();
+      });
+    }
   });
   mgr.events.addSilentRenewError(function (e) {
-    oidc_client_min["Log"].error("".concat(_authName, " silent renew error"), e.message); // TODO: need to restart renew manually?
-    //if (auth.isAuthenticated) {
-    //  setTimeout(() => {
-    //    mgr.signinSilent();
-    //  }, 5000);
-    //}
+    oidc_client_min["Log"].error("".concat(_authName, " auth silent renew error"), e.message); // TODO: need to restart renew manually?
+    // if (auth.isAuthenticated) {
+    //   setTimeout(() => {
+    //     mgr.signinSilent();
+    //   }, 5000);
+    // }
   });
   mgr.events.addUserLoaded(function (user) {
     auth.user = user;
   });
   mgr.events.addUserUnloaded(function () {
-    auth.user = undefined;
+    auth.user = undefined; // redirect if on protected route (best method here?)
+
+    oidc_client_min["Log"].debug("".concat(_authName, " auth user unloaded"));
+
+    if (auth.myRouter) {
+      var current = auth.myRouter.currentRoute;
+
+      if (current && current.meta.authName === _authName) {
+        auth.myRouter.replace('/');
+      }
+    }
   });
   mgr.events.addUserSignedOut(function () {
+    oidc_client_min["Log"].debug("".concat(_authName, " auth user signed out"));
     auth.user = undefined;
   });
 
@@ -1593,47 +1611,7 @@ function createOidcAuth(_authName, defaultSignInType, appBaseUrl, oidcConfig) {
     }
 
     return mgr.signinRedirect(args);
-  } // function handleSignInCalback(type, url) {
-  //   switch (type) {
-  //     case SignInType.Popup:
-  //       return mgr.signinPopupCallback(url);
-  //     case SignInType.Silent:
-  //       return mgr.signinSilentCallback(url);
-  //   }
-  //   return mgr.signinRedirectCallback(url);
-  // }
-  // function createSignInCallbackComponent(router, type) {
-  //   return {
-  //     render: h => h('div'),
-  //     created() {
-  //       handleSignInCalback(type)
-  //         .then(data => {
-  //           Log.debug(
-  //             `${authName} ${SignInType[type]} signin callback success`,
-  //             data
-  //           );
-  //           // need to manually redirect for window type
-  //           if (type === SignInType.Window) {
-  //             // goto original secure route or root
-  //             const redirect = data.state ? data.state.to : null;
-  //             if (router) router.replace(redirect || '/');
-  //             else window.location = appBaseUrl;
-  //           }
-  //         })
-  //         .catch(err => {
-  //           Log.error(
-  //             `${authName} ${SignInType[type]} signin callback error`,
-  //             err
-  //           );
-  //           if (type === SignInType.Window) {
-  //             if (router) router.replace('/');
-  //             else window.location = appBaseUrl;
-  //           }
-  //         });
-  //     }
-  //   };
-  // }
-
+  }
 
   function redirectAfterSignout(router) {
     if (router) {
@@ -1646,7 +1624,7 @@ function createOidcAuth(_authName, defaultSignInType, appBaseUrl, oidcConfig) {
     } //   window.location.reload(true);
 
 
-    if (appBaseUrl) window.location = appBaseUrl;
+    if (_appUrl) window.location = _appUrl;
   }
 
   var _inited = false;
@@ -1657,6 +1635,9 @@ function createOidcAuth(_authName, defaultSignInType, appBaseUrl, oidcConfig) {
       };
     },
     computed: {
+      appUrl: function appUrl() {
+        return _appUrl;
+      },
       authName: function authName() {
         return _authName;
       },
@@ -1750,35 +1731,13 @@ function createOidcAuth(_authName, defaultSignInType, appBaseUrl, oidcConfig) {
                 // goto original secure route or root
 
                 var redirect = data.state ? data.state.to : null;
-                if (router) router.replace(redirect || '/');else window.location = appBaseUrl;
+                if (router) router.replace(redirect || '/');else window.location = _appUrl;
               }).catch(function (err) {
                 oidc_client_min["Log"].error("".concat(_authName, " Window signin callback error"), err);
-                if (router) router.replace('/');else window.location = appBaseUrl;
+                if (router) router.replace('/');else window.location = _appUrl;
               });
             }
-          } //{
-          //  path: `/auth/signinpop/${authName}`,
-          //  name: 'signinpop',
-          //  component: createSignInCallbackComponent(router, SignInType.Popup)
-          //},
-          //{
-          //  path: `/auth/signinsilent/${authName}`,
-          //  name: 'signinsilent',
-          //  component: createSignInCallbackComponent(router, SignInType.Silent)
-          //},
-          //{
-          //  path: `/auth/signoutpop/${authName}`,
-          //  name: 'signout',
-          //  component: Vue.extend({
-          //    render: h => h('div'),
-          //    created() {
-          //      if (defaultSignInType === SignInType.Popup)
-          //        return mgr.signoutPopupCallback(null, false);
-          //      return mgr.signoutRedirectCallback(null);
-          //    }
-          //  })
-          //}
-
+          }
         }]);
       },
       signIn: function signIn(args) {
