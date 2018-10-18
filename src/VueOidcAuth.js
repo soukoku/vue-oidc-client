@@ -103,11 +103,13 @@ export function createOidcAuth(
   mgr.events.addSilentRenewError(e => {
     Log.error(`${authName} auth silent renew error`, e.message);
     // TODO: need to restart renew manually?
-    // if (auth.isAuthenticated) {
-    //   setTimeout(() => {
-    //     mgr.signinSilent();
-    //   }, 5000);
-    // }
+    if (auth.isAuthenticated) {
+      // setTimeout(() => {
+      //   mgr.signinSilent();
+      // }, 5000);
+    } else {
+      auth.signOut();
+    }
   });
 
   mgr.events.addUserLoaded(user => {

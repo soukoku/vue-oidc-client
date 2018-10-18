@@ -1565,11 +1565,13 @@ function createOidcAuth(_authName, defaultSignInType, _appUrl, oidcConfig) {
   });
   mgr.events.addSilentRenewError(function (e) {
     oidc_client_min["Log"].error("".concat(_authName, " auth silent renew error"), e.message); // TODO: need to restart renew manually?
-    // if (auth.isAuthenticated) {
-    //   setTimeout(() => {
-    //     mgr.signinSilent();
-    //   }, 5000);
-    // }
+
+    if (auth.isAuthenticated) {// setTimeout(() => {
+      //   mgr.signinSilent();
+      // }, 5000);
+    } else {
+      auth.signOut();
+    }
   });
   mgr.events.addUserLoaded(function (user) {
     auth.user = user;
