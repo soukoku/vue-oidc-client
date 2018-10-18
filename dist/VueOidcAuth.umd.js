@@ -1602,8 +1602,14 @@ function createOidcAuth(_authName, defaultSignInType, _appUrl, oidcConfig) {
     }
   });
   mgr.events.addUserSignedOut(function () {
-    oidc_client_min["Log"].debug("".concat(_authName, " auth user signed out"));
-    auth.user = undefined;
+    oidc_client_min["Log"].debug("".concat(_authName, " auth user signed out")); // could be from silent frame so do a manual logout as well
+
+    if (auth.isAuthenticated) {
+      auth.user = undefined;
+      auth.signOut();
+    } else {
+      auth.user = undefined;
+    }
   });
 
   function _signIn(type, args) {
