@@ -5457,10 +5457,10 @@ obuf@^1.0.0, obuf@^1.1.1:
   resolved "https://registry.yarnpkg.com/obuf/-/obuf-1.1.2.tgz#09bea3343d41859ebd446292d11c9d4db619084e"
   integrity sha512-PX1wu0AmAdPqOL1mWhqmlOd8kOIZQwGZw6rh7uby9fTc5lhaOWFLX3I6R1hrF9k3zUY40e6igsLGkDXK92LJNg==
 
-oidc-client@^1.5.3-beta.1:
-  version "1.5.3-beta.1"
-  resolved "https://registry.yarnpkg.com/oidc-client/-/oidc-client-1.5.3-beta.1.tgz#c1e1d23a89cfa7531a320a443ec1dc6eb534c3b2"
-  integrity sha512-p4EcEuMuVV2mwcH59BSNE/0zNalksELSpOp/r7oH4vGppIwsE1cHvXhHqc4hX7jpfrxU7wYsEZ74ECNXXnZB5g==
+oidc-client@^1.5.3:
+  version "1.5.3"
+  resolved "https://registry.yarnpkg.com/oidc-client/-/oidc-client-1.5.3.tgz#a1d62716719c61a2a8d588743f0d2eb9d978a1ff"
+  integrity sha512-TvONI7d9ZxlpRNrqkUiFfEhu9dyX7UoN/9mbaoa96r10a8SaekDOJev3ZieHCGsGRvTBFYuIEFefH1D/Zzljxg==
   dependencies:
     jsrsasign "^8.0.12"
   optionalDependencies:

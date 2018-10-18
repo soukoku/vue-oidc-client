@@ -1,10 +1,10 @@
 {
   "name": "vue-oidc-client",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Wrapper around oidc-client-js to to better work in a vue application with router integration.",
   "author": "Eugene Wang",
   "license": "MIT",
-  "main": "src/VueOidcAuth.js",
+  "main": "dist/VueOidcAuth.umd.js",
   "unpkg": "dist/VueOidcAuth.umd.js",
   "jsdelivr": "dist/VueOidcAuth.umd.js",
   "typings": "typings/index.d.ts",
@@ -34,7 +34,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "oidc-client": "^1.5.3-beta.1"
+    "oidc-client": "^1.5.3"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.0.5",
