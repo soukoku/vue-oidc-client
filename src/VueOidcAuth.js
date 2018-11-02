@@ -18,19 +18,7 @@ export const SignInType = {
   /**
    * Uses a hidden iframe to do sign-in.
    */
-  Silent: 2,
-  /**
-   * String value map for Window.
-   */
-  0: 'Window',
-  /**
-   * String value map for Popup.
-   */
-  1: 'Popup',
-  /**
-   * String value map for Silent.
-   */
-  2: 'Silent'
+  Silent: 2
 };
 
 export function createOidcAuth(
@@ -91,24 +79,26 @@ export function createOidcAuth(
       mgr
         .signinSilent()
         .then(() => {
-          Log.debug(`${authName} auth silent renew after token expiration`);
+          Log.debug(`${authName} auth silent signin after token expiration`);
         })
         .catch(() => {
-          Log.debug(`${authName} auth silent renew error token expiration`);
-          auth.signOut();
+          Log.debug(
+            `${authName} auth silent signin error after token expiration`
+          );
+          signInIfNecessary();
         });
     }
   });
 
   mgr.events.addSilentRenewError(e => {
-    Log.error(`${authName} auth silent renew error`, e.message);
+    Log.debug(`${authName} auth silent renew error ${e}`);
     // TODO: need to restart renew manually?
     if (auth.isAuthenticated) {
       // setTimeout(() => {
       //   mgr.signinSilent();
       // }, 5000);
     } else {
-      auth.signOut();
+      signInIfNecessary();
     }
   });
 
@@ -121,12 +111,7 @@ export function createOidcAuth(
 
     // redirect if on protected route (best method here?)
     Log.debug(`${authName} auth user unloaded`);
-    if (auth.myRouter) {
-      const current = auth.myRouter.currentRoute;
-      if (current && current.meta.authName === authName) {
-        auth.myRouter.replace('/');
-      }
-    }
+    signInIfNecessary();
   });
 
   mgr.events.addUserSignedOut(() => {
@@ -134,13 +119,29 @@ export function createOidcAuth(
     // could be from silent frame so do a manual logout as well
     if (auth.isAuthenticated) {
       auth.user = undefined;
-      auth.signOut();
+      // Log.info('signout from user signout');
+      // auth.signOut();
     } else {
       auth.user = undefined;
     }
   });
 
-  function signIn(type, args) {
+  function signInIfNecessary() {
+    if (auth.myRouter) {
+      const current = auth.myRouter.currentRoute;
+      if (current && current.meta.authName === authName) {
+        Log.debug(`${authName} auth page re-signin`);
+
+        signInReal(defaultSignInType, { state: { current } })
+          .then(() => {})
+          .catch(() => {});
+        // window.location.reload();
+        // auth.myRouter.go(); //replace('/');
+      }
+    }
+  }
+
+  function signInReal(type, args) {
     switch (type) {
       case SignInType.Popup:
         return mgr.signinPopup(args);
@@ -165,7 +166,7 @@ export function createOidcAuth(
   let _inited = false;
   const auth = new Vue({
     data() {
-      return { user: undefined };
+      return { user: null };
     },
     computed: {
       appUrl() {
@@ -186,17 +187,19 @@ export function createOidcAuth(
     },
     methods: {
       startup() {
-        var path = window.location.pathname;
+        const path = window.location.pathname;
+        let isCB = false;
         if (path.indexOf('/signinpop/') > -1) {
           mgr.signinPopupCallback();
-          return Promise.resolve(false);
+          isCB = true;
         } else if (path.indexOf('/signinsilent/') > -1) {
           mgr.signinSilentCallback();
-          return Promise.resolve(false);
+          isCB = true;
         } else if (path.indexOf('/signoutpop/') > -1) {
           mgr.signoutPopupCallback();
-          return Promise.resolve(false);
+          isCB = true;
         }
+        if (isCB) return Promise.resolve(0);
 
         if (_inited) {
           return Promise.resolve(true);
@@ -226,7 +229,7 @@ export function createOidcAuth(
             if (this.isAuthenticated) {
               next();
             } else {
-              signIn(defaultSignInType, { state: { to } })
+              signInReal(defaultSignInType, { state: { to } })
                 .then(() => {
                   if (defaultSignInType === SignInType.Window) {
                     next(false);
@@ -273,7 +276,7 @@ export function createOidcAuth(
         ]);
       },
       signIn(args) {
-        return signIn(defaultSignInType, args);
+        return signInReal(defaultSignInType, args);
       },
       signOut(args) {
         if (defaultSignInType === SignInType.Popup) {

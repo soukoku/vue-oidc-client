@@ -1,5 +1,5 @@
-import 'babel-polyfill';
-// import './lib/polyfill';
+// import 'babel-polyfill';
+import 'vue-oidc-client/src/polyfill';
 import Vue from 'vue';
 import App from './App.vue';
 import mainAuth from './auth';
