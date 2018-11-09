@@ -1,6 +1,6 @@
 {
   "name": "vue-oidc-client",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "Wrapper around oidc-client-js to to better work in a vue application with router integration.",
   "author": "Eugene Wang",
   "license": "MIT",

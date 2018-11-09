@@ -7854,10 +7854,10 @@ vue-loader@^15.4.2:
     vue-hot-reload-api "^2.3.0"
     vue-style-loader "^4.1.0"
 
-vue-oidc-client@^0.2.6:
-  version "0.2.6"
-  resolved "https://registry.yarnpkg.com/vue-oidc-client/-/vue-oidc-client-0.2.6.tgz#c22ee119545faf0f944c019438921a6096d6206c"
-  integrity sha512-lWxf7NvCSSMq10Cuo0+kNyIZww1muqcvMAVihnwIANJdLjYX1PIwCPLQIDS4ETy69F21qtsS3FEwDTb/asMYuQ==
+vue-oidc-client@^0.2.7:
+  version "0.2.7"
+  resolved "https://registry.yarnpkg.com/vue-oidc-client/-/vue-oidc-client-0.2.7.tgz#c9980721efdccc8509b3a35e38782fa2514caa83"
+  integrity sha512-Mr1HaC1D0FeQ33NwRRKy027+b7R40Uc36t+FjZ9yQF+QSe6NzgWim3eJpkBFfVYuMgtkP2rcqGz+F92LQD2/WQ==
   dependencies:
     oidc-client "^1.5.4"
 

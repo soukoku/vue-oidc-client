@@ -116,14 +116,8 @@ export function createOidcAuth(
 
   mgr.events.addUserSignedOut(() => {
     Log.debug(`${authName} auth user signed out`);
-    // could be from silent frame so do a manual logout as well
-    if (auth.isAuthenticated) {
-      auth.user = undefined;
-      // Log.info('signout from user signout');
-      // auth.signOut();
-    } else {
-      auth.user = undefined;
-    }
+    auth.user = null;
+    signInIfNecessary();
   });
 
   function signInIfNecessary() {
