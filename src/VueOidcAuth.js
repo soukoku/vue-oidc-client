@@ -1,7 +1,5 @@
-import Vue from 'vue';
-import { UserManager, Log, WebStorageStateStore } from 'oidc-client';
-
-Log.level = Log.DEBUG;
+import Vue from 'vue'
+import { UserManager, Log, WebStorageStateStore } from 'oidc-client'
 
 /**
  * Indicates the sign in behavior.
@@ -19,32 +17,42 @@ export const SignInType = {
    * Uses a hidden iframe to do sign-in.
    */
   Silent: 2
-};
+}
+
+export const LogLevel = {
+  NONE: 0,
+  ERROR: 1,
+  WARN: 2,
+  INFO: 3,
+  DEBUG: 4
+}
 
 export function createOidcAuth(
   authName,
   defaultSignInType,
   appUrl,
   oidcConfig,
-  logger = console
+  logger = console,
+  logLevel = LogLevel.ERROR
 ) {
   if (!authName) {
-    throw new Error('Auth name is required.');
+    throw new Error('Auth name is required.')
   }
   if (
     defaultSignInType !== SignInType.Window &&
     defaultSignInType !== SignInType.Popup
   ) {
-    throw new Error('Only window or popup are valid default signin types.');
+    throw new Error('Only window or popup are valid default signin types.')
   }
   if (!appUrl) {
-    throw new Error('App base url is required.');
+    throw new Error('App base url is required.')
   }
   if (!oidcConfig) {
-    throw new Error('No config provided to oidc auth.');
+    throw new Error('No config provided to oidc auth.')
   }
 
-  Log.logger = logger;
+  Log.level = logLevel
+  Log.logger = logger
 
   // merge config with defaults
   const config = {
@@ -60,75 +68,75 @@ export function createOidcAuth(
     popup_post_logout_redirect_uri: `${appUrl}auth/signoutpop/${authName}`,
     popup_redirect_uri: `${appUrl}auth/signinpop/${authName}`,
     silent_redirect_uri: `${appUrl}auth/signinsilent/${authName}`
-  };
+  }
 
-  Log.debug(`Creating new oidc auth as ${authName}`);
+  Log.debug(`Creating new oidc auth as ${authName}`)
 
-  const mgr = new UserManager(config);
+  const mgr = new UserManager(config)
 
   ///////////////////////////////
   // events
   ///////////////////////////////
   mgr.events.addAccessTokenExpiring(() => {
-    Log.debug(`${authName} auth token expiring`);
-  });
+    Log.debug(`${authName} auth token expiring`)
+  })
 
   mgr.events.addAccessTokenExpired(() => {
-    Log.debug(`${authName} auth token expired`);
+    Log.debug(`${authName} auth token expired`)
     if (auth.isAuthenticated) {
       mgr
         .signinSilent()
         .then(() => {
-          Log.debug(`${authName} auth silent signin after token expiration`);
+          Log.debug(`${authName} auth silent signin after token expiration`)
         })
         .catch(() => {
           Log.debug(
             `${authName} auth silent signin error after token expiration`
-          );
-          signInIfNecessary();
-        });
+          )
+          signInIfNecessary()
+        })
     }
-  });
+  })
 
   mgr.events.addSilentRenewError(e => {
-    Log.debug(`${authName} auth silent renew error ${e}`);
+    Log.debug(`${authName} auth silent renew error ${e}`)
     // TODO: need to restart renew manually?
     if (auth.isAuthenticated) {
       // setTimeout(() => {
       //   mgr.signinSilent();
       // }, 5000);
     } else {
-      signInIfNecessary();
+      signInIfNecessary()
     }
-  });
+  })
 
   mgr.events.addUserLoaded(user => {
-    auth.user = user;
-  });
+    auth.user = user
+  })
 
   mgr.events.addUserUnloaded(() => {
-    auth.user = undefined;
+    auth.user = undefined
 
     // redirect if on protected route (best method here?)
-    Log.debug(`${authName} auth user unloaded`);
-    signInIfNecessary();
-  });
+    Log.debug(`${authName} auth user unloaded`)
+    signInIfNecessary()
+  })
 
   mgr.events.addUserSignedOut(() => {
-    Log.debug(`${authName} auth user signed out`);
-    auth.user = null;
-    signInIfNecessary();
-  });
+    Log.debug(`${authName} auth user signed out`)
+    auth.user = null
+    signInIfNecessary()
+  })
 
   function signInIfNecessary() {
     if (auth.myRouter) {
-      const current = auth.myRouter.currentRoute;
+      const current = auth.myRouter.currentRoute
       if (current && current.meta.authName === authName) {
-        Log.debug(`${authName} auth page re-signin`);
+        Log.debug(`${authName} auth page re-signin`)
 
         signInReal(defaultSignInType, { state: { current } })
           .then(() => {})
-          .catch(() => {});
+          .catch(() => {})
         // window.location.reload();
         // auth.myRouter.go(); //replace('/');
       }
@@ -138,106 +146,106 @@ export function createOidcAuth(
   function signInReal(type, args) {
     switch (type) {
       case SignInType.Popup:
-        return mgr.signinPopup(args);
+        return mgr.signinPopup(args)
       case SignInType.Silent:
-        return mgr.signinSilent(args);
+        return mgr.signinSilent(args)
     }
-    return mgr.signinRedirect(args);
+    return mgr.signinRedirect(args)
   }
 
   function redirectAfterSignout(router) {
     if (router) {
-      const current = router.currentRoute;
+      const current = router.currentRoute
       if (current && current.meta.authName === authName) {
-        router.replace('/');
-        return;
+        router.replace('/')
+        return
       }
     }
     //   window.location.reload(true);
-    if (appUrl) window.location = appUrl;
+    if (appUrl) window.location = appUrl
   }
 
-  let _inited = false;
+  let _inited = false
   const auth = new Vue({
     data() {
-      return { user: null };
+      return { user: null }
     },
     computed: {
       appUrl() {
-        return appUrl;
+        return appUrl
       },
       authName() {
-        return authName;
+        return authName
       },
       isAuthenticated() {
-        return !!this.user && !this.user.expired;
+        return !!this.user && !this.user.expired
       },
       accessToken() {
-        return !!this.user && !this.user.expired ? this.user.access_token : '';
+        return !!this.user && !this.user.expired ? this.user.access_token : ''
       },
       userProfile() {
-        return !!this.user && !this.user.expired ? this.user.profile : {};
+        return !!this.user && !this.user.expired ? this.user.profile : {}
       }
     },
     methods: {
       startup() {
-        const path = window.location.pathname;
-        let isCB = false;
+        const path = window.location.pathname
+        let isCB = false
         if (path.indexOf('/signinpop/') > -1) {
-          mgr.signinPopupCallback();
-          isCB = true;
+          mgr.signinPopupCallback()
+          isCB = true
         } else if (path.indexOf('/signinsilent/') > -1) {
-          mgr.signinSilentCallback();
-          isCB = true;
+          mgr.signinSilentCallback()
+          isCB = true
         } else if (path.indexOf('/signoutpop/') > -1) {
-          mgr.signoutPopupCallback();
-          isCB = true;
+          mgr.signoutPopupCallback()
+          isCB = true
         }
-        if (isCB) return Promise.resolve(0);
+        if (isCB) return Promise.resolve(0)
 
         if (_inited) {
-          return Promise.resolve(true);
+          return Promise.resolve(true)
         } else {
           // load user from storage
           return mgr
             .getUser()
             .then(test => {
-              _inited = true;
+              _inited = true
               if (test && !test.expired) {
-                this.user = test;
+                this.user = test
               }
-              return true;
+              return true
             })
             .catch(err => {
-              Log.warn(`Auth startup err = ${err}`);
-              return false;
-            });
+              Log.warn(`Auth startup err = ${err}`)
+              return false
+            })
         }
       },
       useRouter(router) {
-        this.myRouter = router;
+        this.myRouter = router
         const guard = (to, from, next) => {
           if (
             to.matched.some(record => record.meta.authName === this.authName)
           ) {
             if (this.isAuthenticated) {
-              next();
+              next()
             } else {
               signInReal(defaultSignInType, { state: { to } })
                 .then(() => {
                   if (defaultSignInType === SignInType.Window) {
-                    next(false);
+                    next(false)
                   } else {
-                    next();
+                    next()
                   }
                 })
-                .catch(() => next(false));
+                .catch(() => next(false))
             }
           } else {
-            next();
+            next()
           }
-        };
-        router.beforeEach(guard);
+        }
+        router.beforeEach(guard)
 
         router.addRoutes([
           {
@@ -252,43 +260,43 @@ export function createOidcAuth(
                     Log.debug(
                       `${authName} Window signin callback success`,
                       data
-                    );
+                    )
                     // need to manually redirect for window type
                     // goto original secure route or root
-                    const redirect = data.state ? data.state.to : null;
-                    if (router) router.replace(redirect || '/');
-                    else window.location = appUrl;
+                    const redirect = data.state ? data.state.to : null
+                    if (router) router.replace(redirect || '/')
+                    else window.location = appUrl
                   })
                   .catch(err => {
-                    Log.error(`${authName} Window signin callback error`, err);
-                    if (router) router.replace('/');
-                    else window.location = appUrl;
-                  });
+                    Log.error(`${authName} Window signin callback error`, err)
+                    if (router) router.replace('/')
+                    else window.location = appUrl
+                  })
               }
             }
           }
-        ]);
+        ])
       },
       signIn(args) {
-        return signInReal(defaultSignInType, args);
+        return signInReal(defaultSignInType, args)
       },
       signOut(args) {
         if (defaultSignInType === SignInType.Popup) {
-          const router = this.myRouter;
+          const router = this.myRouter
           return mgr
             .signoutPopup(args)
             .then(() => {
-              redirectAfterSignout(router);
+              redirectAfterSignout(router)
             })
             .catch(() => {
               // could be window closed
-              redirectAfterSignout(router);
-            });
+              redirectAfterSignout(router)
+            })
         }
-        return mgr.signoutRedirect(args);
+        return mgr.signoutRedirect(args)
       }
     }
-  });
+  })
 
-  return auth;
+  return auth
 }

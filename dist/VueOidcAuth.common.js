@@ -3389,7 +3389,6 @@ var oidc_client_min = __webpack_require__("dd17");
 
 
 
-oidc_client_min["Log"].level = oidc_client_min["Log"].DEBUG;
 /**
  * Indicates the sign in behavior.
  */
@@ -3410,8 +3409,16 @@ var SignInType = {
    */
   Silent: 2
 };
+var LogLevel = {
+  NONE: 0,
+  ERROR: 1,
+  WARN: 2,
+  INFO: 3,
+  DEBUG: 4
+};
 function createOidcAuth(_authName, defaultSignInType, _appUrl, oidcConfig) {
   var logger = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : console;
+  var logLevel = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : LogLevel.ERROR;
 
   if (!_authName) {
     throw new Error('Auth name is required.');
@@ -3429,6 +3436,7 @@ function createOidcAuth(_authName, defaultSignInType, _appUrl, oidcConfig) {
     throw new Error('No config provided to oidc auth.');
   }
 
+  oidc_client_min["Log"].level = logLevel;
   oidc_client_min["Log"].logger = logger; // merge config with defaults
 
   var config = _objectSpread({
@@ -3672,6 +3680,7 @@ function createOidcAuth(_authName, defaultSignInType, _appUrl, oidcConfig) {
 }
 // CONCATENATED MODULE: ./node_modules/@vue/cli-service/lib/commands/build/entry-lib-no-default.js
 /* concated harmony reexport SignInType */__webpack_require__.d(__webpack_exports__, "SignInType", function() { return SignInType; });
+/* concated harmony reexport LogLevel */__webpack_require__.d(__webpack_exports__, "LogLevel", function() { return LogLevel; });
 /* concated harmony reexport createOidcAuth */__webpack_require__.d(__webpack_exports__, "createOidcAuth", function() { return createOidcAuth; });
 
 

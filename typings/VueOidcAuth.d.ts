@@ -1,7 +1,7 @@
-import VueRouter from 'vue-router';
-import { UserManagerSettings, Logger } from 'oidc-client';
+import VueRouter from 'vue-router'
+import { UserManagerSettings, Logger } from 'oidc-client'
 
-type Dictionary<T> = { [key: string]: T };
+type Dictionary<T> = { [key: string]: T }
 
 /**
  * Indicates the sign in behavior.
@@ -22,6 +22,32 @@ export enum SignInType {
 }
 
 /**
+ * Logging level values used by createOidcAuth().
+ */
+export enum LogLevel {
+  /**
+   * No logs messages.
+   */
+  NONE = 0,
+  /**
+   * Only error messages.
+   */
+  ERROR = 1,
+  /**
+   * Error and warning messages.
+   */
+  WARN = 2,
+  /**
+   * Error, warning, and info messages.
+   */
+  INFO = 3,
+  /**
+   * Everything.
+   */
+  DEBUG = 4
+}
+
+/**
  * Creates an openid-connect auth instance.
  * @param authName - short name (no spaces) that identifies the auth instance for routing purposes.
  * @param defaultSignInType - the signin method to use when `signIn()` and `signOut()` are called.
@@ -34,8 +60,9 @@ export function createOidcAuth(
   defaultSignInType: SignInType,
   appUrl: string,
   oidcConfig: UserManagerSettings,
-  logger?: Logger
-): OidcAuth;
+  logger?: Logger,
+  logLevel?: LogLevel
+): OidcAuth
 
 /**
  * A wrapper on oidc-client with vue support.
@@ -44,44 +71,44 @@ export interface OidcAuth {
   /**
    * Original app url used to create this instance.
    */
-  readonly appUrl: string;
+  readonly appUrl: string
   /**
    * Name of this oidc authentication instance.
    * Use in a route's meta:{authName} property to protect that route.
    */
-  readonly authName: string;
+  readonly authName: string
   /**
    * Gets whether the user is authenticated.
    */
-  readonly isAuthenticated: boolean;
+  readonly isAuthenticated: boolean
   /**
    * Gets the API access token if applicable.
    */
-  readonly accessToken: string;
+  readonly accessToken: string
   /**
    * Gets the user claims if authenticated.
    */
-  readonly userProfile: Dictionary<any>;
+  readonly userProfile: Dictionary<any>
   /**
    * Required call before all the properties are reliably initialized.
    * Should be called and waited on before starting the root Vue instance.
    */
-  startup(): Promise<any>;
+  startup(): Promise<any>
   /**
    * Hookup this auth instance with a vue-router instance.
    * This will guard routes with meta: { authName: `name of this auth` }
    * and register redirect callback routes.
    * @param router - the vue router instance.
    */
-  useRouter(router: VueRouter): void;
+  useRouter(router: VueRouter): void
   /**
    * Starts the login flow explicitly.
    * @param args
    */
-  signIn(args?: any): Promise<any>;
+  signIn(args?: any): Promise<any>
   /**
    * Starts the logout flow.
    * @param args
    */
-  signOut(args?: any): Promise<any>;
+  signOut(args?: any): Promise<any>
 }
