@@ -82,29 +82,36 @@ export function createOidcAuth(
   })
 
   mgr.events.addAccessTokenExpired(() => {
-    Log.debug(`${authName} auth token expired`)
-    if (auth.isAuthenticated) {
-      mgr
-        .signinSilent()
-        .then(() => {
-          Log.debug(`${authName} auth silent signin after token expiration`)
-        })
-        .catch(() => {
-          Log.debug(
-            `${authName} auth silent signin error after token expiration`
-          )
-          signInIfNecessary()
-        })
-    }
+    Log.debug(
+      `${authName} auth token expired, user is authenticated=${
+        auth.isAuthenticated
+      }`
+    )
+    auth.user = null
+    signInIfNecessary()
+    // if (auth.isAuthenticated) {
+    //   mgr
+    //     .signinSilent()
+    //     .then(() => {
+    //       Log.debug(`${authName} auth silent signin after token expiration`)
+    //     })
+    //     .catch(() => {
+    //       Log.debug(
+    //         `${authName} auth silent signin error after token expiration`
+    //       )
+    //       signInIfNecessary()
+    //     })
+    // }
   })
 
   mgr.events.addSilentRenewError(e => {
     Log.debug(`${authName} auth silent renew error ${e}`)
     // TODO: need to restart renew manually?
     if (auth.isAuthenticated) {
-      // setTimeout(() => {
-      //   mgr.signinSilent();
-      // }, 5000);
+      setTimeout(() => {
+        Log.debug(`${authName} auth silent renew retry`)
+        mgr.signinSilent()
+      }, 5000)
     } else {
       signInIfNecessary()
     }
@@ -128,15 +135,23 @@ export function createOidcAuth(
     signInIfNecessary()
   })
 
+  mgr.events.addUserSessionChanged(user => {
+    Log.debug(`${authName} auth user session changed:`, user)
+  })
+
   function signInIfNecessary() {
     if (auth.myRouter) {
       const current = auth.myRouter.currentRoute
       if (current && current.meta.authName === authName) {
-        Log.debug(`${authName} auth page re-signin`)
+        Log.debug(`${authName} auth page re-signin with ${defaultSignInType}`)
 
         signInReal(defaultSignInType, { state: { current } })
-          .then(() => {})
-          .catch(() => {})
+          .then(() => {
+            // auth.myRouter()
+          })
+          .catch(() => {
+            setTimeout(signInIfNecessary, 5000)
+          })
         // window.location.reload();
         // auth.myRouter.go(); //replace('/');
       }
@@ -229,8 +244,18 @@ export function createOidcAuth(
             to.matched.some(record => record.meta.authName === this.authName)
           ) {
             if (this.isAuthenticated) {
+              Log.debug(
+                `${authName} auth authenticated user entering protected route ${
+                  to.fullPath
+                }`
+              )
               next()
             } else {
+              Log.debug(
+                `${authName} auth anon user entering protected route ${
+                  to.fullPath
+                }`
+              )
               signInReal(defaultSignInType, { state: { to } })
                 .then(() => {
                   if (defaultSignInType === SignInType.Window) {

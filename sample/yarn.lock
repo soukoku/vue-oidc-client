@@ -5501,10 +5501,10 @@ obuf@^1.0.0, obuf@^1.1.2:
   resolved "https://registry.yarnpkg.com/obuf/-/obuf-1.1.2.tgz#09bea3343d41859ebd446292d11c9d4db619084e"
   integrity sha512-PX1wu0AmAdPqOL1mWhqmlOd8kOIZQwGZw6rh7uby9fTc5lhaOWFLX3I6R1hrF9k3zUY40e6igsLGkDXK92LJNg==
 
-oidc-client@^1.5.4:
-  version "1.5.4"
-  resolved "https://registry.yarnpkg.com/oidc-client/-/oidc-client-1.5.4.tgz#5efb7464848e39926778ad96b155935282b9fe0b"
-  integrity sha512-ddom2rLs7xc6kAOOD7LMXQJTcoJxGLfIM/Up19/LiDYQQrSERGCtyuqjyDoR8T2XQtFhU5Y2HWs1O3WdvyYckA==
+oidc-client@^1.6.1:
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/oidc-client/-/oidc-client-1.6.1.tgz#76a7f24ad7fb5342269b6cae895bb32e1e27e785"
+  integrity sha512-buA9G0hlFjUwxoL/xuHunBtTgoICtJSojnZtATqMliUTKxPYAzHprOQ85Lj0hgF+Zv8lI/ViqaNFDG0Z5KCUKA==
   dependencies:
     jsrsasign "^8.0.12"
   optionalDependencies:
@@ -8063,11 +8063,11 @@ vue-loader@^15.6.2:
     vue-style-loader "^4.1.0"
 
 vue-oidc-client@^0.2.9:
-  version "0.2.7"
-  resolved "https://registry.yarnpkg.com/vue-oidc-client/-/vue-oidc-client-0.2.7.tgz#c9980721efdccc8509b3a35e38782fa2514caa83"
-  integrity sha512-Mr1HaC1D0FeQ33NwRRKy027+b7R40Uc36t+FjZ9yQF+QSe6NzgWim3eJpkBFfVYuMgtkP2rcqGz+F92LQD2/WQ==
+  version "0.2.9"
+  resolved "https://registry.yarnpkg.com/vue-oidc-client/-/vue-oidc-client-0.2.9.tgz#04221dd434ef6a20adf5eddeee4dfe13ea2541b9"
+  integrity sha512-xWalzfClqC6tdNOqe6v2TF9hKCbpo3x4HfpoWpR402kQwuaz/n8jUM82uE4bWE1JdMH57L5x5OiIPn/wzqXIpw==
   dependencies:
-    oidc-client "^1.5.4"
+    oidc-client "^1.6.1"
 
 vue-router@^3.0.2:
   version "3.0.2"

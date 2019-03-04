@@ -3473,23 +3473,30 @@ function createOidcAuth(_authName, defaultSignInType, _appUrl, oidcConfig) {
     oidc_client_min["Log"].debug("".concat(_authName, " auth token expiring"));
   });
   mgr.events.addAccessTokenExpired(function () {
-    oidc_client_min["Log"].debug("".concat(_authName, " auth token expired"));
-
-    if (auth.isAuthenticated) {
-      mgr.signinSilent().then(function () {
-        oidc_client_min["Log"].debug("".concat(_authName, " auth silent signin after token expiration"));
-      }).catch(function () {
-        oidc_client_min["Log"].debug("".concat(_authName, " auth silent signin error after token expiration"));
-        signInIfNecessary();
-      });
-    }
+    oidc_client_min["Log"].debug("".concat(_authName, " auth token expired, user is authenticated=").concat(auth.isAuthenticated));
+    auth.user = null;
+    signInIfNecessary(); // if (auth.isAuthenticated) {
+    //   mgr
+    //     .signinSilent()
+    //     .then(() => {
+    //       Log.debug(`${authName} auth silent signin after token expiration`)
+    //     })
+    //     .catch(() => {
+    //       Log.debug(
+    //         `${authName} auth silent signin error after token expiration`
+    //       )
+    //       signInIfNecessary()
+    //     })
+    // }
   });
   mgr.events.addSilentRenewError(function (e) {
     oidc_client_min["Log"].debug("".concat(_authName, " auth silent renew error ").concat(e)); // TODO: need to restart renew manually?
 
-    if (auth.isAuthenticated) {// setTimeout(() => {
-      //   mgr.signinSilent();
-      // }, 5000);
+    if (auth.isAuthenticated) {
+      setTimeout(function () {
+        oidc_client_min["Log"].debug("".concat(_authName, " auth silent renew retry"));
+        mgr.signinSilent();
+      }, 5000);
     } else {
       signInIfNecessary();
     }
@@ -3508,18 +3515,24 @@ function createOidcAuth(_authName, defaultSignInType, _appUrl, oidcConfig) {
     auth.user = null;
     signInIfNecessary();
   });
+  mgr.events.addUserSessionChanged(function (user) {
+    oidc_client_min["Log"].debug("".concat(_authName, " auth user session changed:"), user);
+  });
 
   function signInIfNecessary() {
     if (auth.myRouter) {
       var current = auth.myRouter.currentRoute;
 
       if (current && current.meta.authName === _authName) {
-        oidc_client_min["Log"].debug("".concat(_authName, " auth page re-signin"));
+        oidc_client_min["Log"].debug("".concat(_authName, " auth page re-signin with ").concat(defaultSignInType));
         signInReal(defaultSignInType, {
           state: {
             current: current
           }
-        }).then(function () {}).catch(function () {}); // window.location.reload();
+        }).then(function () {// auth.myRouter()
+        }).catch(function () {
+          setTimeout(signInIfNecessary, 5000);
+        }); // window.location.reload();
         // auth.myRouter.go(); //replace('/');
       }
     }
@@ -3623,8 +3636,10 @@ function createOidcAuth(_authName, defaultSignInType, _appUrl, oidcConfig) {
             return record.meta.authName === _this2.authName;
           })) {
             if (_this2.isAuthenticated) {
+              oidc_client_min["Log"].debug("".concat(_authName, " auth authenticated user entering protected route ").concat(to.fullPath));
               next();
             } else {
+              oidc_client_min["Log"].debug("".concat(_authName, " auth anon user entering protected route ").concat(to.fullPath));
               signInReal(defaultSignInType, {
                 state: {
                   to: to
