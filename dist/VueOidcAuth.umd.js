@@ -3156,8 +3156,8 @@ var external_oidc_ = __webpack_require__("c097");
 
 var SignInType = Object.freeze({
   Window: 0,
-  Popup: 1,
-  Silent: 2
+  Popup: 1 // Silent: 2
+
 });
 var LogLevel = Object.freeze({
   None: 0,
@@ -3286,9 +3286,8 @@ function createOidcAuth(_authName, defaultSignInType, _appUrl, oidcConfig) {
     switch (type) {
       case SignInType.Popup:
         return mgr.signinPopup(args);
-
-      case SignInType.Silent:
-        return mgr.signinSilent(args);
+      // case SignInType.Silent:
+      //   return mgr.signinSilent(args)
     }
 
     return mgr.signinRedirect(args);
