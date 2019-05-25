@@ -3,8 +3,8 @@ import { UserManager, Log, WebStorageStateStore } from 'oidc-client'
 
 export const SignInType = Object.freeze({
   Window: 0,
-  Popup: 1,
-  Silent: 2
+  Popup: 1
+  // Silent: 2
 })
 
 export const LogLevel = Object.freeze({
@@ -154,8 +154,8 @@ export function createOidcAuth(
     switch (type) {
       case SignInType.Popup:
         return mgr.signinPopup(args)
-      case SignInType.Silent:
-        return mgr.signinSilent(args)
+      // case SignInType.Silent:
+      //   return mgr.signinSilent(args)
     }
     return mgr.signinRedirect(args)
   }

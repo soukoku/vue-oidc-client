@@ -14,11 +14,11 @@ export enum SignInType {
   /**
    * Uses a popup window to do sign-in.
    */
-  Popup,
-  /**
-   * Uses a hidden iframe to do sign-in.
-   */
-  Silent
+  Popup
+  // /**
+  //  * Uses a hidden iframe to do sign-in.
+  //  */
+  // Silent
 }
 
 /**
