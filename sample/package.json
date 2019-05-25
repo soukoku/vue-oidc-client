@@ -12,14 +12,14 @@
     "vue-oidc-client": "^0.2.9"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^3.4.1",
-    "@vue/cli-plugin-eslint": "^3.4.1",
-    "@vue/cli-service": "^3.4.1",
+    "@vue/cli-plugin-babel": "^3.7.0",
+    "@vue/cli-plugin-eslint": "^3.7.0",
+    "@vue/cli-service": "^3.7.0",
     "babel-polyfill": "^6.26.0",
-    "lint-staged": "^8.1.5",
-    "vue": "^2.6.8",
-    "vue-router": "^3.0.2",
-    "vue-template-compiler": "^2.6.8"
+    "lint-staged": "^8.1.7",
+    "vue": "^2.6.10",
+    "vue-router": "^3.0.6",
+    "vue-template-compiler": "^2.6.10"
   },
   "eslintConfig": {
     "root": true,
