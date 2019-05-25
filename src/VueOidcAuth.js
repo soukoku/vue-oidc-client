@@ -15,6 +15,25 @@ export const LogLevel = Object.freeze({
   Debug: 4
 })
 
+function getUrlPath(url) {
+  const a = document.createElement('a')
+  a.href = url
+  let p = a.pathname
+  if (p[0] !== '/') p += '/'
+  return p
+}
+
+/**
+ * Checks if current url's path matches given url's path.
+ * @param {String} testUrl - url to test against.
+ */
+function matchesPath(testUrl) {
+  return (
+    window.location.pathname.toLocaleLowerCase() ===
+    getUrlPath(testUrl).toLocaleLowerCase()
+  )
+}
+
 export function createOidcAuth(
   authName,
   defaultSignInType,
@@ -51,11 +70,11 @@ export function createOidcAuth(
       store: sessionStorage
     }),
     post_logout_redirect_uri: appUrl,
-    ...oidcConfig, // all properties after this are not user configurable
     redirect_uri: `${appUrl}auth/signinwin/${authName}`,
     popup_post_logout_redirect_uri: `${appUrl}auth/signoutpop/${authName}`,
     popup_redirect_uri: `${appUrl}auth/signinpop/${authName}`,
-    silent_redirect_uri: `${appUrl}auth/signinsilent/${authName}`
+    silent_redirect_uri: `${appUrl}auth/signinsilent/${authName}`,
+    ...oidcConfig // everything can be overridden!
   }
 
   Log.debug(`Creating new oidc auth as ${authName}`)
@@ -177,15 +196,14 @@ export function createOidcAuth(
     },
     methods: {
       startup() {
-        const path = window.location.pathname
         let isCB = false
-        if (path.indexOf('/signinpop/') > -1) {
+        if (matchesPath(config.popup_redirect_uri)) {
           mgr.signinPopupCallback()
           isCB = true
-        } else if (path.indexOf('/signinsilent/') > -1) {
+        } else if (matchesPath(config.silent_redirect_uri)) {
           mgr.signinSilentCallback()
           isCB = true
-        } else if (path.indexOf('/signoutpop/') > -1) {
+        } else if (matchesPath(config.popup_post_logout_redirect_uri)) {
           mgr.signoutPopupCallback()
           isCB = true
         }
@@ -235,35 +253,43 @@ export function createOidcAuth(
         }
         router.beforeEach(guard)
 
-        router.addRoutes([
-          {
-            path: `/auth/signinwin/${authName}`,
-            name: 'signinwin',
-            component: {
-              render: h => h('div'),
-              created() {
-                mgr
-                  .signinRedirectCallback()
-                  .then(data => {
-                    Log.debug(
-                      `${authName} Window signin callback success`,
-                      data
-                    )
-                    // need to manually redirect for window type
-                    // goto original secure route or root
-                    const redirect = data.state ? data.state.to : null
-                    if (router) router.replace(redirect || '/')
-                    else window.location = appUrl
-                  })
-                  .catch(err => {
-                    Log.error(`${authName} Window signin callback error`, err)
-                    if (router) router.replace('/')
-                    else window.location = appUrl
-                  })
+        if (config.redirect_uri) {
+          const vroutePath =
+            '/' +
+            getUrlPath(config.redirect_uri).substring(
+              (router.options.base || '/').length
+            )
+
+          router.addRoutes([
+            {
+              path: vroutePath,
+              name: `signinwin-${authName}`,
+              component: {
+                render: h => h('div'),
+                created() {
+                  mgr
+                    .signinRedirectCallback()
+                    .then(data => {
+                      Log.debug(
+                        `${authName} Window signin callback success`,
+                        data
+                      )
+                      // need to manually redirect for window type
+                      // goto original secure route or root
+                      const redirect = data.state ? data.state.to : null
+                      if (router) router.replace(redirect || '/')
+                      else window.location = appUrl
+                    })
+                    .catch(err => {
+                      Log.error(`${authName} Window signin callback error`, err)
+                      if (router) router.replace('/')
+                      else window.location = appUrl
+                    })
+                }
               }
             }
-          }
-        ])
+          ])
+        }
       },
       signIn(args) {
         return signInReal(defaultSignInType, args)
