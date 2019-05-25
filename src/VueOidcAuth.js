@@ -48,7 +48,7 @@ export function createOidcAuth(
     scope: 'openid profile',
     automaticSilentRenew: true,
     userStore: new WebStorageStateStore({
-      store: localStorage
+      store: sessionStorage
     }),
     post_logout_redirect_uri: appUrl,
     ...oidcConfig, // all properties after this are not user configurable
