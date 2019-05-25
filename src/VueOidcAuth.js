@@ -1,31 +1,19 @@
 import Vue from 'vue'
 import { UserManager, Log, WebStorageStateStore } from 'oidc-client'
 
-/**
- * Indicates the sign in behavior.
- */
-export const SignInType = {
-  /**
-   * Uses the main browser window to do sign-in.
-   */
+export const SignInType = Object.freeze({
   Window: 0,
-  /**
-   * Uses a popup window to do sign-in.
-   */
   Popup: 1,
-  /**
-   * Uses a hidden iframe to do sign-in.
-   */
   Silent: 2
-}
+})
 
-export const LogLevel = {
-  NONE: 0,
-  ERROR: 1,
-  WARN: 2,
-  INFO: 3,
-  DEBUG: 4
-}
+export const LogLevel = Object.freeze({
+  None: 0,
+  Error: 1,
+  Warn: 2,
+  Info: 3,
+  Debug: 4
+})
 
 export function createOidcAuth(
   authName,
@@ -33,7 +21,7 @@ export function createOidcAuth(
   appUrl,
   oidcConfig,
   logger = console,
-  logLevel = LogLevel.ERROR
+  logLevel = LogLevel.Error
 ) {
   if (!authName) {
     throw new Error('Auth name is required.')
@@ -54,7 +42,7 @@ export function createOidcAuth(
   Log.level = logLevel
   Log.logger = logger
 
-  // merge config with defaults
+  // merge passed oidcConfig with defaults
   const config = {
     response_type: 'id_token',
     scope: 'openid profile',

@@ -28,23 +28,23 @@ export enum LogLevel {
   /**
    * No logs messages.
    */
-  NONE = 0,
+  None = 0,
   /**
    * Only error messages.
    */
-  ERROR = 1,
+  Error = 1,
   /**
    * Error and warning messages.
    */
-  WARN = 2,
+  Warn = 2,
   /**
    * Error, warning, and info messages.
    */
-  INFO = 3,
+  Info = 3,
   /**
    * Everything.
    */
-  DEBUG = 4
+  Debug = 4
 }
 
 /**
