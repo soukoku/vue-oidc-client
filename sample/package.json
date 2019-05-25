@@ -9,7 +9,7 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
-    "vue-oidc-client": "^0.2.9"
+    "vue-oidc-client": "^0.3.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.7.0",

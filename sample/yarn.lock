@@ -1560,7 +1560,7 @@ babel-plugin-module-resolver@3.2.0:
     reselect "^3.0.1"
     resolve "^1.4.0"
 
-babel-polyfill@>=6.9.1, babel-polyfill@^6.26.0:
+babel-polyfill@^6.26.0:
   version "6.26.0"
   resolved "https://registry.yarnpkg.com/babel-polyfill/-/babel-polyfill-6.26.0.tgz#379937abc67d7895970adc621f284cd966cf2153"
   integrity sha1-N5k3q8Z9eJWXCtxiHyhM2WbPIVM=
@@ -4987,11 +4987,6 @@ jsprim@^1.2.2:
     json-schema "0.2.3"
     verror "1.10.0"
 
-jsrsasign@^8.0.12:
-  version "8.0.12"
-  resolved "https://registry.yarnpkg.com/jsrsasign/-/jsrsasign-8.0.12.tgz#22abb9656d34a30b9530436720835e89c2e5c316"
-  integrity sha1-Iqu5ZW00owuVMENnIINeicLlwxY=
-
 killable@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/killable/-/killable-1.0.1.tgz#4c8ce441187a061c7474fb87ca08e2a638194892"
@@ -5948,14 +5943,10 @@ obuf@^1.0.0, obuf@^1.1.2:
   resolved "https://registry.yarnpkg.com/obuf/-/obuf-1.1.2.tgz#09bea3343d41859ebd446292d11c9d4db619084e"
   integrity sha512-PX1wu0AmAdPqOL1mWhqmlOd8kOIZQwGZw6rh7uby9fTc5lhaOWFLX3I6R1hrF9k3zUY40e6igsLGkDXK92LJNg==
 
-oidc-client@^1.6.1:
-  version "1.6.1"
-  resolved "https://registry.yarnpkg.com/oidc-client/-/oidc-client-1.6.1.tgz#76a7f24ad7fb5342269b6cae895bb32e1e27e785"
-  integrity sha512-buA9G0hlFjUwxoL/xuHunBtTgoICtJSojnZtATqMliUTKxPYAzHprOQ85Lj0hgF+Zv8lI/ViqaNFDG0Z5KCUKA==
-  dependencies:
-    jsrsasign "^8.0.12"
-  optionalDependencies:
-    babel-polyfill ">=6.9.1"
+oidc-client@^1.7.1:
+  version "1.7.1"
+  resolved "https://registry.yarnpkg.com/oidc-client/-/oidc-client-1.7.1.tgz#8b9d8d50fd7f878968b1cda17712c1747eef9a54"
+  integrity sha512-qsPBQVa/BY6AmdY89erANJbfDXrX1dqu9lKgvYZzkVDzIj5mmw6wGjFeQuV2HDm4TiJA0VT5HSTWOWnXZUYu0g==
 
 on-finished@~2.3.0:
   version "2.3.0"
@@ -8713,12 +8704,12 @@ vue-loader@^15.7.0:
     vue-hot-reload-api "^2.3.0"
     vue-style-loader "^4.1.0"
 
-vue-oidc-client@^0.2.9:
-  version "0.2.9"
-  resolved "https://registry.yarnpkg.com/vue-oidc-client/-/vue-oidc-client-0.2.9.tgz#04221dd434ef6a20adf5eddeee4dfe13ea2541b9"
-  integrity sha512-xWalzfClqC6tdNOqe6v2TF9hKCbpo3x4HfpoWpR402kQwuaz/n8jUM82uE4bWE1JdMH57L5x5OiIPn/wzqXIpw==
+vue-oidc-client@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/vue-oidc-client/-/vue-oidc-client-0.3.0.tgz#304000df252899e2e2ffc13e384677631ed9fdde"
+  integrity sha512-R2DPW5RgSFGghq7oF7ghti9nDT9xUOqOfSUc0WCWUd8DXpIJxs/L2QtZ5Q7ncskjKdgoibK3pPHXlI6MLL9Bgw==
   dependencies:
-    oidc-client "^1.6.1"
+    oidc-client "^1.7.1"
 
 vue-router@^3.0.6:
   version "3.0.6"
