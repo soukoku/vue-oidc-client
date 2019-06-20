@@ -19,7 +19,7 @@ function getUrlPath(url) {
   const a = document.createElement('a')
   a.href = url
   let p = a.pathname
-  if (p[0] !== '/') p += '/'
+  if (p[0] !== '/') p = '/' + p
   return p
 }
 
