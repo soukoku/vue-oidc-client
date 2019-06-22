@@ -3171,7 +3171,7 @@ function getUrlPath(url) {
   var a = document.createElement('a');
   a.href = url;
   var p = a.pathname;
-  if (p[0] !== '/') p += '/';
+  if (p[0] !== '/') p = '/' + p;
   return p;
 }
 /**
