@@ -277,7 +277,35 @@ export function createOidcAuth(
           }
         }
         router.beforeEach(guard)
-
+        if (config.silent_redirect_uri) {
+          const sroutePath =
+            '/' +
+            getUrlPath(config.silent_redirect_uri).substring(
+              (router.options.base || '/').length
+            )
+          router.addRoutes([
+            {
+              path: sroutePath,
+              name: `signinsilent-${authName}`,
+              component: {
+                render: h => h('div'),
+                created() {
+                  mgr
+                    .signinSilentCallback()
+                    .then(data => {
+                      Log.debug(
+                        `${authName} Renew signin-silent callback success`,
+                        data
+                      )
+                    })
+                    .catch(err => {
+                      Log.error(`${authName} Renew signin-silent callback error`, err)
+                    })
+                }
+              }
+            }
+          ])
+        }
         if (config.redirect_uri) {
           const vroutePath =
             '/' +
