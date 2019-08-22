@@ -18,7 +18,7 @@ var mainOidc = createOidcAuth(
     login_hint: 'bob'
   },
   console,
-  LogLevel.Info
+  LogLevel.Debug
 )
 Vue.prototype.$oidc = mainOidc
 export default mainOidc
