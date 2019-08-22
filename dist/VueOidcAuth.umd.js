@@ -3348,20 +3348,23 @@ function createOidcAuth(_authName, defaultSignInType, _appUrl, oidcConfig) {
       startup: function startup() {
         var _this = this;
 
-        var isCB = false;
+        var isCB = false; // CB = callback
 
         if (matchesPath(config.popup_redirect_uri)) {
+          external_oidc_["Log"].debug("".concat(_authName, " Popup signin callback"));
           mgr.signinPopupCallback();
           isCB = true;
         } else if (matchesPath(config.silent_redirect_uri)) {
+          external_oidc_["Log"].debug("".concat(_authName, " Silent signin callback"));
           mgr.signinSilentCallback();
           isCB = true;
         } else if (matchesPath(config.popup_post_logout_redirect_uri)) {
+          external_oidc_["Log"].debug("".concat(_authName, " Popup logout callback"));
           mgr.signoutPopupCallback();
           isCB = true;
         }
 
-        if (isCB) return Promise.resolve(0);
+        if (isCB) return Promise.resolve(false);
 
         if (_inited) {
           return Promise.resolve(true);

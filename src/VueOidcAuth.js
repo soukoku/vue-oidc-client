@@ -211,18 +211,21 @@ export function createOidcAuth(
     },
     methods: {
       startup() {
-        let isCB = false
+        let isCB = false // CB = callback
         if (matchesPath(config.popup_redirect_uri)) {
+          Log.debug(`${authName} Popup signin callback`)
           mgr.signinPopupCallback()
           isCB = true
         } else if (matchesPath(config.silent_redirect_uri)) {
+          Log.debug(`${authName} Silent signin callback`)
           mgr.signinSilentCallback()
           isCB = true
         } else if (matchesPath(config.popup_post_logout_redirect_uri)) {
+          Log.debug(`${authName} Popup logout callback`)
           mgr.signoutPopupCallback()
           isCB = true
         }
-        if (isCB) return Promise.resolve(0)
+        if (isCB) return Promise.resolve(false)
 
         if (_inited) {
           return Promise.resolve(true)
@@ -277,7 +280,7 @@ export function createOidcAuth(
           }
         }
         router.beforeEach(guard)
-
+        
         if (config.redirect_uri) {
           const vroutePath =
             '/' +
