@@ -1,6 +1,6 @@
 {
   "name": "vue-oidc-client",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Wrapper around oidc-client-js to to better work in a Vue application with Vue Router integration.",
   "author": "Eugene Wang",
   "license": "MIT",
@@ -34,15 +34,15 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "oidc-client": "^1.7.1"
+    "oidc-client": "^1.9.0"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^3.8.0",
-    "@vue/cli-plugin-eslint": "^3.8.0",
-    "@vue/cli-service": "^3.8.0",
-    "lint-staged": "^8.2.0",
+    "@vue/cli-plugin-babel": "^3.11.0",
+    "@vue/cli-plugin-eslint": "^3.11.0",
+    "@vue/cli-service": "^3.11.0",
+    "lint-staged": "^8.2.1",
     "vue": "^2.6.10",
-    "vue-router": "^3.0.6",
+    "vue-router": "^3.1.2",
     "vue-template-compiler": "^2.6.10"
   },
   "eslintConfig": {
