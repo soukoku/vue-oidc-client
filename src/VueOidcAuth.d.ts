@@ -111,4 +111,12 @@ export interface OidcAuth {
    * @param args
    */
   signOut(args?: any): Promise<any>
+  /**
+   * Enables silent renew.
+   */
+  startSilentRenew(): void
+  /**
+   * Disables silent renew.
+   */
+  stopSilentRenew(): void
 }

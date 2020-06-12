@@ -90,9 +90,7 @@ export function createOidcAuth(
 
   mgr.events.addAccessTokenExpired(() => {
     Log.debug(
-      `${authName} auth token expired, user is authenticated=${
-        auth.isAuthenticated
-      }`
+      `${authName} auth token expired, user is authenticated=${auth.isAuthenticated}`
     )
     auth.user = null
     signInIfNecessary()
@@ -254,16 +252,12 @@ export function createOidcAuth(
           ) {
             if (this.isAuthenticated) {
               Log.debug(
-                `${authName} auth authenticated user entering protected route ${
-                  to.fullPath
-                }`
+                `${authName} auth authenticated user entering protected route ${to.fullPath}`
               )
               next()
             } else {
               Log.debug(
-                `${authName} auth anon user entering protected route ${
-                  to.fullPath
-                }`
+                `${authName} auth anon user entering protected route ${to.fullPath}`
               )
               signInReal(defaultSignInType, { state: { to } })
                 .then(() => {
@@ -280,7 +274,7 @@ export function createOidcAuth(
           }
         }
         router.beforeEach(guard)
-        
+
         if (config.redirect_uri) {
           const vroutePath =
             '/' +
@@ -336,6 +330,12 @@ export function createOidcAuth(
             })
         }
         return mgr.signoutRedirect(args)
+      },
+      startSilentRenew() {
+        mgr.startSilentRenew()
+      },
+      stopSilentRenew() {
+        mgr.stopSilentRenew()
       }
     }
   })
