@@ -10,8 +10,8 @@ var mainOidc = createOidcAuth(
   appRootUrl,
   {
     authority: 'https://demo.identityserver.io/',
-    client_id: 'implicit.shortlived', // 'implicit.shortlived',
-    response_type: 'id_token token',
+    client_id: 'interactive.public', // 'implicit.shortlived',
+    response_type: 'code',
     scope: 'openid profile email api',
     // test use
     prompt: 'login',
