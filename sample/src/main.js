@@ -37,9 +37,9 @@ mainAuth.$on('userSignedOut', function() {
   console.log('user signed out');
 });
 
-mainAuth.$on('userSessionChanged', function(user) {
+mainAuth.$on('userSessionChanged', function() {
   // eslint-disable-next-line no-console
-  console.log('user session changed', user);
+  console.log('user session changed');
 });
 
 mainAuth.startup().then(ok => {

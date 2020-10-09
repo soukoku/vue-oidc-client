@@ -146,8 +146,8 @@ export function createOidcAuth(
     signInIfNecessary()
   })
 
-  mgr.events.addUserSessionChanged(user => {
-    Log.debug(`${authName} auth user session changed:`, user)
+  mgr.events.addUserSessionChanged(() => {
+    Log.debug(`${authName} auth user session changed`)
     auth.$emit('userSessionChanged')
   })
 
