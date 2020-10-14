@@ -9,17 +9,17 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
-    "vue-oidc-client": "^0.4.1"
+    "vue-oidc-client": "^0.4.2"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^3.11.0",
-    "@vue/cli-plugin-eslint": "^3.11.0",
-    "@vue/cli-service": "^3.11.0",
+    "@vue/cli-plugin-babel": "^4.5.7",
+    "@vue/cli-plugin-eslint": "^4.5.7",
+    "@vue/cli-service": "^4.5.7",
     "babel-polyfill": "^6.26.0",
-    "lint-staged": "^8.2.1",
-    "vue": "^2.6.10",
-    "vue-router": "^3.0.6",
-    "vue-template-compiler": "^2.6.10"
+    "lint-staged": "^10.4.0",
+    "vue": "^2.6.12",
+    "vue-router": "^3.4.6",
+    "vue-template-compiler": "^2.6.12"
   },
   "eslintConfig": {
     "root": true,
