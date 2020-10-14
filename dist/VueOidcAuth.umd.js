@@ -4010,10 +4010,12 @@ function createOidcAuth(_authName, defaultSignInType, _appUrl, oidcConfig) {
 
   mgr.events.addAccessTokenExpiring(function () {
     external_oidc_["Log"].debug("".concat(_authName, " auth token expiring"));
+    auth.$emit('accessTokenExpiring');
   });
   mgr.events.addAccessTokenExpired(function () {
     external_oidc_["Log"].debug("".concat(_authName, " auth token expired, user is authenticated=").concat(auth.isAuthenticated));
     auth.user = null;
+    auth.$emit('accessTokenExpired');
     signInIfNecessary(); // if (auth.isAuthenticated) {
     //   mgr
     //     .signinSilent()
@@ -4029,7 +4031,8 @@ function createOidcAuth(_authName, defaultSignInType, _appUrl, oidcConfig) {
     // }
   });
   mgr.events.addSilentRenewError(function (e) {
-    external_oidc_["Log"].debug("".concat(_authName, " auth silent renew error ").concat(e)); // TODO: need to restart renew manually?
+    external_oidc_["Log"].debug("".concat(_authName, " auth silent renew error ").concat(e));
+    auth.$emit('silentRenewError', e); // TODO: need to restart renew manually?
 
     if (auth.isAuthenticated) {
       setTimeout(function () {
@@ -4042,9 +4045,11 @@ function createOidcAuth(_authName, defaultSignInType, _appUrl, oidcConfig) {
   });
   mgr.events.addUserLoaded(function (user) {
     auth.user = user;
+    auth.$emit('userLoaded', user);
   });
   mgr.events.addUserUnloaded(function () {
-    auth.user = undefined; // redirect if on protected route (best method here?)
+    auth.user = undefined;
+    auth.$emit('userUnloaded'); // redirect if on protected route (best method here?)
 
     external_oidc_["Log"].debug("".concat(_authName, " auth user unloaded"));
     signInIfNecessary();
@@ -4052,10 +4057,12 @@ function createOidcAuth(_authName, defaultSignInType, _appUrl, oidcConfig) {
   mgr.events.addUserSignedOut(function () {
     external_oidc_["Log"].debug("".concat(_authName, " auth user signed out"));
     auth.user = null;
+    auth.$emit('userSignedOut');
     signInIfNecessary();
   });
-  mgr.events.addUserSessionChanged(function (user) {
-    external_oidc_["Log"].debug("".concat(_authName, " auth user session changed:"), user);
+  mgr.events.addUserSessionChanged(function () {
+    external_oidc_["Log"].debug("".concat(_authName, " auth user session changed"));
+    auth.$emit('userSessionChanged');
   });
 
   function signInIfNecessary() {
