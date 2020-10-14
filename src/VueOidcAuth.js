@@ -86,6 +86,7 @@ export function createOidcAuth(
   ///////////////////////////////
   mgr.events.addAccessTokenExpiring(() => {
     Log.debug(`${authName} auth token expiring`)
+    auth.$emit('accessTokenExpiring')
   })
 
   mgr.events.addAccessTokenExpired(() => {
@@ -93,6 +94,7 @@ export function createOidcAuth(
       `${authName} auth token expired, user is authenticated=${auth.isAuthenticated}`
     )
     auth.user = null
+    auth.$emit('accessTokenExpired')
     signInIfNecessary()
     // if (auth.isAuthenticated) {
     //   mgr
@@ -111,6 +113,7 @@ export function createOidcAuth(
 
   mgr.events.addSilentRenewError(e => {
     Log.debug(`${authName} auth silent renew error ${e}`)
+    auth.$emit('silentRenewError', e)
     // TODO: need to restart renew manually?
     if (auth.isAuthenticated) {
       setTimeout(() => {
@@ -124,10 +127,12 @@ export function createOidcAuth(
 
   mgr.events.addUserLoaded(user => {
     auth.user = user
+    auth.$emit('userLoaded', user)
   })
 
   mgr.events.addUserUnloaded(() => {
     auth.user = undefined
+    auth.$emit('userUnloaded')
 
     // redirect if on protected route (best method here?)
     Log.debug(`${authName} auth user unloaded`)
@@ -137,11 +142,13 @@ export function createOidcAuth(
   mgr.events.addUserSignedOut(() => {
     Log.debug(`${authName} auth user signed out`)
     auth.user = null
+    auth.$emit('userSignedOut')
     signInIfNecessary()
   })
 
-  mgr.events.addUserSessionChanged(user => {
-    Log.debug(`${authName} auth user session changed:`, user)
+  mgr.events.addUserSessionChanged(() => {
+    Log.debug(`${authName} auth user session changed`)
+    auth.$emit('userSessionChanged')
   })
 
   function signInIfNecessary() {
