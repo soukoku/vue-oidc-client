@@ -34,20 +34,20 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "oidc-client": "^1.10.1"
+    "oidc-client": "^1.11.5"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^4.4.4",
-    "@vue/cli-plugin-eslint": "^4.4.4",
-    "@vue/cli-service": "^4.4.4",
+    "@vue/cli-plugin-babel": "^4.5.12",
+    "@vue/cli-plugin-eslint": "^4.5.12",
+    "@vue/cli-service": "^4.5.12",
     "babel-eslint": "^10.1.0",
-    "core-js": "^3.6.5",
+    "core-js": "^3.10.0",
     "eslint": "^6.8.0",
-    "eslint-plugin-vue": "^6.2.2",
-    "lint-staged": "^10.2.10",
-    "vue": "^2.6.11",
-    "vue-router": "^3.3.3",
-    "vue-template-compiler": "^2.6.11"
+    "eslint-plugin-vue": "^7.8.0",
+    "lint-staged": "^10.5.4",
+    "vue": "^2.6.12",
+    "vue-router": "^3.5.1",
+    "vue-template-compiler": "^2.6.12"
   },
   "eslintConfig": {
     "root": true,
