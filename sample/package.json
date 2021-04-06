@@ -9,17 +9,19 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
-    "regenerator-runtime": "^0.13.7",
-    "vue-oidc-client": "^0.4.2"
+    "core-js": "^3.10.0",
+    "vue": "^2.6.12",
+    "vue-oidc-client": "^0.4.2",
+    "vue-router": "^3.5.1"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^4.5.7",
-    "@vue/cli-plugin-eslint": "^4.5.7",
-    "@vue/cli-service": "^4.5.7",
-    "babel-polyfill": "^6.26.0",
-    "lint-staged": "^10.4.0",
-    "vue": "^2.6.12",
-    "vue-router": "^3.4.6",
+    "@vue/cli-plugin-babel": "~4.5.12",
+    "@vue/cli-plugin-eslint": "~4.5.12",
+    "@vue/cli-plugin-router": "~4.5.12",
+    "@vue/cli-service": "~4.5.12",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^6.8.0",
+    "eslint-plugin-vue": "^7.8.0",
     "vue-template-compiler": "^2.6.12"
   },
   "eslintConfig": {
@@ -31,10 +33,10 @@
       "plugin:vue/essential",
       "eslint:recommended"
     ],
-    "rules": {},
     "parserOptions": {
       "parser": "babel-eslint"
-    }
+    },
+    "rules": {}
   },
   "postcss": {
     "plugins": {
@@ -44,19 +46,6 @@
   "browserslist": [
     "> 1%",
     "last 2 versions",
-    "not ie <= 8"
-  ],
-  "gitHooks": {
-    "pre-commit": "lint-staged"
-  },
-  "lint-staged": {
-    "*.js": [
-      "vue-cli-service lint",
-      "git add"
-    ],
-    "*.vue": [
-      "vue-cli-service lint",
-      "git add"
-    ]
-  }
+    "not dead"
+  ]
 }

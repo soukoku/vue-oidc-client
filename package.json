@@ -37,14 +37,14 @@
     "oidc-client": "^1.11.5"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^4.5.12",
-    "@vue/cli-plugin-eslint": "^4.5.12",
-    "@vue/cli-service": "^4.5.12",
+    "@vue/cli-plugin-babel": "~4.5.12",
+    "@vue/cli-plugin-eslint": "~4.5.12",
+    "@vue/cli-plugin-router": "~4.5.12",
+    "@vue/cli-service": "~4.5.12",
     "babel-eslint": "^10.1.0",
     "core-js": "^3.10.0",
     "eslint": "^6.8.0",
     "eslint-plugin-vue": "^7.8.0",
-    "lint-staged": "^10.5.4",
     "vue": "^2.6.12",
     "vue-router": "^3.5.1",
     "vue-template-compiler": "^2.6.12"
@@ -72,18 +72,5 @@
     "> 1%",
     "last 2 versions",
     "not ie <= 8"
-  ],
-  "gitHooks": {
-    "pre-commit": "lint-staged"
-  },
-  "lint-staged": {
-    "*.js": [
-      "vue-cli-service lint",
-      "git add"
-    ],
-    "*.vue": [
-      "vue-cli-service lint",
-      "git add"
-    ]
-  }
+  ]
 }
