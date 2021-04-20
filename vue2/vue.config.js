@@ -23,11 +23,13 @@ function fixEmitDeclarationFilesForTypeScript(config) {
 module.exports = {
   chainWebpack: config => {
     fixEmitDeclarationFilesForTypeScript(config)
-    config.externals({
-      ...config.get('externals'),
-      'vue-router': 'VueRouter',
-      'oidc-client': 'oidc'
-    })
+    if (process.env.NODE_ENV === 'production') {
+      config.externals({
+        ...config.get('externals'),
+        'vue-router': 'VueRouter',
+        'oidc-client': 'oidc'
+      })
+    }
   },
   parallel: process.env.NODE_ENV !== 'production'
 }

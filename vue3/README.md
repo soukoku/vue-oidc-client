@@ -1,4 +1,4 @@
-# vue3
+# Source for Vue 3 version along with the sample site
 
 ## Project setup
 ```
@@ -19,6 +19,3 @@ npm run build
 ```
 npm run lint
 ```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).

@@ -31,10 +31,11 @@ cd vue-oidc-client
 
 ### Running the sample
 
-Go into either the `vue2` or `vue3` folders. Run it with
+Go into either the `vue2` or `vue3` folders. Run it with the typical install and run
 
 ```bash
+npm install
 npm run serve
 ```
 
-and browse to the url indicated in the prompt.
+then browse to the url indicated in the prompt.
