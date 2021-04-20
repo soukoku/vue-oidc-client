@@ -1,6 +1,6 @@
 // vue 3 version
 import { Router } from 'vue-router'
-import { ref, reactive, computed, h, ComputedRef } from 'vue'
+import { ref, reactive, computed, h } from 'vue'
 import {
   UserManagerSettings,
   Log,
@@ -178,8 +178,8 @@ export function createOidcAuth(
   const user = ref(null as User | null)
 
   const authObj = reactive({
-    appUrl: computed(() => appUrl),
-    authName: computed(() => authName),
+    appUrl,
+    authName,
     isAuthenticated: computed(() => !!user.value && !user.value.expired),
     accessToken: computed(() =>
       !!user.value && !user.value.expired ? user.value.access_token : ''
@@ -195,7 +195,7 @@ export function createOidcAuth(
             iat: 0
           }
     ),
-    events: computed(() => mgr.events),
+    events: mgr.events,
     signIn(args?: any) {
       return signInReal(defaultSignInType, args)
     },
@@ -260,11 +260,9 @@ export function createOidcAuth(
 
       router.beforeEach((to, from, next) => {
         if (
-          to.matched.some(
-            record => record.meta.authName === this.authName.value
-          )
+          to.matched.some(record => record.meta.authName === authObj.authName)
         ) {
-          if (this.isAuthenticated.value) {
+          if (authObj.isAuthenticated) {
             Log.debug(
               `${authName} auth authenticated user entering protected route ${to.fullPath}`
             )
