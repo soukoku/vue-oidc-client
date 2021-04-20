@@ -8,7 +8,8 @@ import {
   User,
   UserManager,
   Profile,
-  WebStorageStateStore
+  WebStorageStateStore,
+  UserManagerEvents
 } from 'oidc-client'
 
 /**
@@ -77,6 +78,10 @@ export interface OidcAuth {
    */
   readonly userProfile: Profile
   /**
+   * Gets the auth events provided by oidc-client.
+   */
+  readonly events: UserManagerEvents
+  /**
    * Required call before all the properties are reliably initialized.
    * Should be called and waited on before starting the root Vue instance.
    */
@@ -106,20 +111,7 @@ export interface OidcAuth {
    * Disables silent renew.
    */
   stopSilentRenew(): void
-  /**
-   * Listen for auth-related events.
-   * @param event See https://github.com/IdentityModel/oidc-client-js/wiki#events for supported events.
-   * @param callback
-   */
-  $on(
-    event: string | string[],
-    callback: UserLoadedCallback | VoidCallback | SilentRenewErrorCallback
-  ): this
 }
-
-type UserLoadedCallback = (user: User) => void
-type VoidCallback = () => void
-type SilentRenewErrorCallback = (error: Error) => void
 
 /**
  * Creates an openid-connect auth instance.
@@ -212,6 +204,9 @@ export function createOidcAuth(
               exp: 0,
               iat: 0
             }
+      },
+      events(): UserManagerEvents {
+        return mgr.events
       }
     },
     methods: {
@@ -393,21 +388,14 @@ export function createOidcAuth(
   function handleManagerEvents() {
     mgr.events.addUserLoaded(user => {
       auth.user = user
-      auth.$emit('userLoaded', user)
     })
 
     mgr.events.addUserUnloaded(() => {
       auth.user = null
-      auth.$emit('userUnloaded')
 
       // redirect if on protected route (best method here?)
       Log.debug(`${auth.authName} auth user unloaded`)
       signInIfNecessary()
-    })
-
-    mgr.events.addAccessTokenExpiring(() => {
-      Log.debug(`${auth.authName} auth token expiring`)
-      auth.$emit('accessTokenExpiring')
     })
 
     mgr.events.addAccessTokenExpired(() => {
@@ -415,7 +403,6 @@ export function createOidcAuth(
         `${auth.authName} auth token expired, user is authenticated=${auth.isAuthenticated}`
       )
       auth.user = null
-      auth.$emit('accessTokenExpired')
       signInIfNecessary()
       // if (auth.isAuthenticated) {
       //   mgr
@@ -434,7 +421,6 @@ export function createOidcAuth(
 
     mgr.events.addSilentRenewError(e => {
       Log.debug(`${auth.authName} auth silent renew error ${e}`)
-      auth.$emit('silentRenewError', e)
       // TODO: need to restart renew manually?
       if (auth.isAuthenticated) {
         setTimeout(() => {
@@ -446,21 +432,10 @@ export function createOidcAuth(
       }
     })
 
-    mgr.events.addUserSignedIn(() => {
-      Log.debug(`${auth.authName} auth user signed in`)
-      auth.$emit('userSignedIn')
-    })
-
     mgr.events.addUserSignedOut(() => {
       Log.debug(`${auth.authName} auth user signed out`)
       auth.user = null
-      auth.$emit('userSignedOut')
       signInIfNecessary()
-    })
-
-    mgr.events.addUserSessionChanged(() => {
-      Log.debug(`${auth.authName} auth user session changed`)
-      auth.$emit('userSessionChanged')
     })
   }
 

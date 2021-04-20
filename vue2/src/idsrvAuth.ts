@@ -22,38 +22,37 @@ const idsrvAuth = createOidcAuth(
 )
 
 // handle events
-
-idsrvAuth.$on('accessTokenExpiring', function() {
+idsrvAuth.events.addAccessTokenExpiring(function() {
   // eslint-disable-next-line no-console
   console.log('access token expiring')
 })
 
-idsrvAuth.$on('accessTokenExpired', function() {
+idsrvAuth.events.addAccessTokenExpired(function() {
   // eslint-disable-next-line no-console
   console.log('access token expired')
 })
 
-idsrvAuth.$on('silentRenewError', function(err: Error) {
+idsrvAuth.events.addSilentRenewError(function(err: Error) {
   // eslint-disable-next-line no-console
   console.error('silent renew error', err)
 })
 
-idsrvAuth.$on('userLoaded', function(user: User) {
+idsrvAuth.events.addUserLoaded(function(user: User) {
   // eslint-disable-next-line no-console
   console.log('user loaded', user)
 })
 
-idsrvAuth.$on('userUnloaded', function() {
+idsrvAuth.events.addUserUnloaded(function() {
   // eslint-disable-next-line no-console
   console.log('user unloaded')
 })
 
-idsrvAuth.$on('userSignedOut', function() {
+idsrvAuth.events.addUserSignedOut(function() {
   // eslint-disable-next-line no-console
   console.log('user signed out')
 })
 
-idsrvAuth.$on('userSessionChanged', function() {
+idsrvAuth.events.addUserSessionChanged(function() {
   // eslint-disable-next-line no-console
   console.log('user session changed')
 })

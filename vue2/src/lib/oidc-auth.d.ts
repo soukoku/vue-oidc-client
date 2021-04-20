@@ -1,5 +1,5 @@
 import VueRouter from 'vue-router';
-import { UserManagerSettings, Logger, User, Profile } from 'oidc-client';
+import { UserManagerSettings, Logger, User, Profile, UserManagerEvents } from 'oidc-client';
 /**
  * Indicates the sign in behavior.
  */
@@ -64,6 +64,10 @@ export interface OidcAuth {
      */
     readonly userProfile: Profile;
     /**
+     * Gets the auth events provided by oidc-client.
+     */
+    readonly events: UserManagerEvents;
+    /**
      * Required call before all the properties are reliably initialized.
      * Should be called and waited on before starting the root Vue instance.
      */
@@ -93,16 +97,7 @@ export interface OidcAuth {
      * Disables silent renew.
      */
     stopSilentRenew(): void;
-    /**
-     * Listen for auth-related events.
-     * @param event See https://github.com/IdentityModel/oidc-client-js/wiki#events for supported events.
-     * @param callback
-     */
-    $on(event: string | string[], callback: UserLoadedCallback | VoidCallback | SilentRenewErrorCallback): this;
 }
-declare type UserLoadedCallback = (user: User) => void;
-declare type VoidCallback = () => void;
-declare type SilentRenewErrorCallback = (error: Error) => void;
 /**
  * Creates an openid-connect auth instance.
  * @param authName - short alpha-numeric name that identifies the auth instance for routing purposes.
@@ -115,4 +110,3 @@ declare type SilentRenewErrorCallback = (error: Error) => void;
  * @param logLevel - minimum level to log. Defaults to LogLevel.Error.
  */
 export declare function createOidcAuth(authName: string, defaultSignInType: SignInType, appUrl: string, oidcConfig: UserManagerSettings, logger?: Logger, logLevel?: LogLevel): OidcAuth;
-export {};
