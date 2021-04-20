@@ -19,6 +19,7 @@
     "declaration": true,
   },
   "include": [
+    // "src/lib/*.ts"
     "src/**/*.ts",
     "src/**/*.tsx",
     "src/**/*.vue",
