@@ -1,6 +1,6 @@
 import { User } from 'oidc-client'
 import Vue from 'vue'
-import { createOidcAuth, SignInType, LogLevel } from './lib/oidc-auth'
+import { createOidcAuth, SignInType, LogLevel } from '../oidc-auth'
 
 const loco = window.location
 const appRootUrl = `${loco.protocol}//${loco.host}${process.env.BASE_URL}`

@@ -26,7 +26,6 @@ module.exports = {
     if (process.env.NODE_ENV === 'production') {
       config.externals({
         ...config.get('externals'),
-        'vue-router': 'VueRouter',
         'oidc-client': 'oidc'
       })
     }

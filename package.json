@@ -6,7 +6,7 @@
   "license": "MIT",
   "files": [
     "vue2/dist/VueOidcAuth*",
-    "vue2/src/lib/*"
+    "vue2/src/lib/oidc*"
   ],
   "keywords": [
     "vue",
