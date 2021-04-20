@@ -80,7 +80,7 @@ export interface OidcAuth {
    * Required call before all the properties are reliably initialized.
    * Should be called and waited on before starting the root Vue instance.
    */
-  startup(): Promise<any>
+  startup(): Promise<boolean>
   /**
    * Hookup this auth instance with a vue-router instance.
    * This will guard routes with meta: { authName: `name of this auth` }
@@ -92,12 +92,12 @@ export interface OidcAuth {
    * Starts the login flow explicitly.
    * @param args
    */
-  signIn(args?: any): Promise<any>
+  signIn(args?: any): Promise<User | void>
   /**
    * Starts the logout flow.
    * @param args
    */
-  signOut(args?: any): Promise<any>
+  signOut(args?: any): Promise<void>
   /**
    * Enables silent renew.
    */
@@ -106,7 +106,20 @@ export interface OidcAuth {
    * Disables silent renew.
    */
   stopSilentRenew(): void
+  /**
+   * Listen for auth-related events.
+   * @param event See https://github.com/IdentityModel/oidc-client-js/wiki#events for supported events.
+   * @param callback
+   */
+  $on(
+    event: string | string[],
+    callback: UserLoadedCallback | VoidCallback | SilentRenewErrorCallback
+  ): this
 }
+
+type UserLoadedCallback = (user: User) => void
+type VoidCallback = () => void
+type SilentRenewErrorCallback = (error: Error) => void
 
 /**
  * Creates an openid-connect auth instance.
@@ -276,35 +289,33 @@ export function createOidcAuth(
               (router.options.base || '/').length
             )
 
-          router.addRoutes([
-            {
-              path: vroutePath,
-              name: `signinwin-${nameSlug}`,
-              component: {
-                render: h => h('div'),
-                created() {
-                  mgr
-                    .signinRedirectCallback()
-                    .then(data => {
-                      Log.debug(
-                        `${authName} Window signin callback success`,
-                        data
-                      )
-                      // need to manually redirect for window type
-                      // goto original secure route or root
-                      const redirect = data.state ? data.state.to : null
-                      if (router) router.replace(redirect || '/')
-                      else window.location.href = appUrl
-                    })
-                    .catch(err => {
-                      Log.error(`${authName} Window signin callback error`, err)
-                      if (router) router.replace('/')
-                      else window.location.href = appUrl
-                    })
-                }
+          router.addRoute({
+            path: vroutePath,
+            name: `signinwin-${nameSlug}`,
+            component: {
+              render: h => h('div'),
+              created() {
+                mgr
+                  .signinRedirectCallback()
+                  .then(data => {
+                    Log.debug(
+                      `${authName} Window signin callback success`,
+                      data
+                    )
+                    // need to manually redirect for window type
+                    // goto original secure route or root
+                    const redirect = data.state ? data.state.to : null
+                    if (router) router.replace(redirect || '/')
+                    else window.location.href = appUrl
+                  })
+                  .catch(err => {
+                    Log.error(`${authName} Window signin callback error`, err)
+                    if (router) router.replace('/')
+                    else window.location.href = appUrl
+                  })
               }
             }
-          ])
+          })
         }
       },
       signIn(args?: any) {
@@ -380,6 +391,20 @@ export function createOidcAuth(
    * if necessary.
    */
   function handleManagerEvents() {
+    mgr.events.addUserLoaded(user => {
+      auth.user = user
+      auth.$emit('userLoaded', user)
+    })
+
+    mgr.events.addUserUnloaded(() => {
+      auth.user = null
+      auth.$emit('userUnloaded')
+
+      // redirect if on protected route (best method here?)
+      Log.debug(`${auth.authName} auth user unloaded`)
+      signInIfNecessary()
+    })
+
     mgr.events.addAccessTokenExpiring(() => {
       Log.debug(`${auth.authName} auth token expiring`)
       auth.$emit('accessTokenExpiring')
@@ -421,18 +446,9 @@ export function createOidcAuth(
       }
     })
 
-    mgr.events.addUserLoaded(user => {
-      auth.user = user
-      auth.$emit('userLoaded', user)
-    })
-
-    mgr.events.addUserUnloaded(() => {
-      auth.user = null
-      auth.$emit('userUnloaded')
-
-      // redirect if on protected route (best method here?)
-      Log.debug(`${auth.authName} auth user unloaded`)
-      signInIfNecessary()
+    mgr.events.addUserSignedIn(() => {
+      Log.debug(`${auth.authName} auth user signed in`)
+      auth.$emit('userSignedIn')
     })
 
     mgr.events.addUserSignedOut(() => {
@@ -483,9 +499,9 @@ function slugify(str: string) {
   str = str.toLowerCase()
 
   // remove accents, swap ñ for n, etc
-  var from = 'ãàáäâáº½èéëêìíïîõòóöôùúüûñç·/_,:;'
-  var to = 'aaaaaeeeeeiiiiooooouuuunc------'
-  for (var i = 0, l = from.length; i < l; i++) {
+  const from = 'ãàáäâáº½èéëêìíïîõòóöôùúüûñç·/_,:;'
+  const to = 'aaaaaeeeeeiiiiooooouuuunc------'
+  for (let i = 0, l = from.length; i < l; i++) {
     str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i))
   }
 

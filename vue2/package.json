@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "serve-async": "vue-cli-service serve src/main-async.ts",
+    "build": "vue-cli-service build --target lib --name VueOidcAuth src/lib/oidc-auth.ts",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
