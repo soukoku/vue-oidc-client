@@ -1,6 +1,6 @@
 <template>
   <div id="nav">
-    <router-link to="/">Home</router-link> |
+    <router-link to="/">Vue 3 Home</router-link> |
     <router-link to="/about">About (Protected) </router-link> |
     <a href="#" @click="$oidc.signOut()" v-if="$oidc.isAuthenticated"
       >Signout</a
