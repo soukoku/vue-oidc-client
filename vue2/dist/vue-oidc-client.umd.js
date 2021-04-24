@@ -1,12 +1,12 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("vue"), require("oidc"));
+		module.exports = factory(require("vue"), require("oidc-client"));
 	else if(typeof define === 'function' && define.amd)
-		define([, "oidc"], factory);
+		define([, "oidc-client"], factory);
 	else if(typeof exports === 'object')
-		exports["vue-oidc-client"] = factory(require("vue"), require("oidc"));
+		exports["vue-oidc-client"] = factory(require("vue"), require("oidc-client"));
 	else
-		root["vue-oidc-client"] = factory(root["Vue"], root["oidc"]);
+		root["vue-oidc-client"] = factory(root["Vue"], root["oidc-client"]);
 })((typeof self !== 'undefined' ? self : this), function(__WEBPACK_EXTERNAL_MODULE__8bbf__, __WEBPACK_EXTERNAL_MODULE_c097__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -4042,8 +4042,8 @@ var es_regexp_to_string = __webpack_require__("25f0");
 var external_commonjs_vue_commonjs2_vue_root_Vue_ = __webpack_require__("8bbf");
 var external_commonjs_vue_commonjs2_vue_root_Vue_default = /*#__PURE__*/__webpack_require__.n(external_commonjs_vue_commonjs2_vue_root_Vue_);
 
-// EXTERNAL MODULE: external "oidc"
-var external_oidc_ = __webpack_require__("c097");
+// EXTERNAL MODULE: external "oidc-client"
+var external_oidc_client_ = __webpack_require__("c097");
 
 // CONCATENATED MODULE: ./src/vue-oidc-client.ts
 
@@ -4137,15 +4137,15 @@ function createOidcAuth(_authName, defaultSignInType, _appUrl, oidcConfig, logge
     throw new Error('No config provided to oidc auth.');
   }
 
-  external_oidc_["Log"].logger = logger || console;
-  external_oidc_["Log"].level = logLevel || LogLevel.Error;
+  external_oidc_client_["Log"].logger = logger || console;
+  external_oidc_client_["Log"].level = logLevel || LogLevel.Error;
   var nameSlug = slugify(_authName); // merge passed oidcConfig with defaults
 
   var config = _objectSpread2({
     response_type: 'id_token',
     scope: 'openid profile',
     automaticSilentRenew: true,
-    userStore: new external_oidc_["WebStorageStateStore"]({
+    userStore: new external_oidc_client_["WebStorageStateStore"]({
       store: sessionStorage
     }),
     post_logout_redirect_uri: _appUrl,
@@ -4155,8 +4155,8 @@ function createOidcAuth(_authName, defaultSignInType, _appUrl, oidcConfig, logge
     silent_redirect_uri: "".concat(_appUrl, "auth/signinsilent/").concat(nameSlug)
   }, oidcConfig);
 
-  external_oidc_["Log"].debug("Creating new oidc auth as ".concat(_authName));
-  var mgr = new external_oidc_["UserManager"](config);
+  external_oidc_client_["Log"].debug("Creating new oidc auth as ".concat(_authName));
+  var mgr = new external_oidc_client_["UserManager"](config);
   var _inited = false;
   var auth = new external_commonjs_vue_commonjs2_vue_root_Vue_default.a({
     data: function data() {
@@ -4198,15 +4198,15 @@ function createOidcAuth(_authName, defaultSignInType, _appUrl, oidcConfig, logge
         var isCB = false; // CB = callback
 
         if (matchesPath(config.popup_redirect_uri)) {
-          external_oidc_["Log"].debug("".concat(_authName, " Popup signin callback"));
+          external_oidc_client_["Log"].debug("".concat(_authName, " Popup signin callback"));
           mgr.signinPopupCallback();
           isCB = true;
         } else if (matchesPath(config.silent_redirect_uri)) {
-          external_oidc_["Log"].debug("".concat(_authName, " Silent signin callback"));
+          external_oidc_client_["Log"].debug("".concat(_authName, " Silent signin callback"));
           mgr.signinSilentCallback();
           isCB = true;
         } else if (matchesPath(config.popup_post_logout_redirect_uri)) {
-          external_oidc_["Log"].debug("".concat(_authName, " Popup logout callback"));
+          external_oidc_client_["Log"].debug("".concat(_authName, " Popup logout callback"));
           mgr.signoutPopupCallback();
           isCB = true;
         }
@@ -4226,7 +4226,7 @@ function createOidcAuth(_authName, defaultSignInType, _appUrl, oidcConfig, logge
 
             return true;
           }).catch(function (err) {
-            external_oidc_["Log"].warn("Auth startup err = ".concat(err));
+            external_oidc_client_["Log"].warn("Auth startup err = ".concat(err));
             return false;
           });
         }
@@ -4240,10 +4240,10 @@ function createOidcAuth(_authName, defaultSignInType, _appUrl, oidcConfig, logge
             return record.meta.authName === _this2.authName;
           })) {
             if (_this2.isAuthenticated) {
-              external_oidc_["Log"].debug("".concat(_authName, " auth authenticated user entering protected route ").concat(to.fullPath));
+              external_oidc_client_["Log"].debug("".concat(_authName, " auth authenticated user entering protected route ").concat(to.fullPath));
               next();
             } else {
-              external_oidc_["Log"].debug("".concat(_authName, " auth anon user entering protected route ").concat(to.fullPath));
+              external_oidc_client_["Log"].debug("".concat(_authName, " auth anon user entering protected route ").concat(to.fullPath));
               signInReal(defaultSignInType, {
                 state: {
                   to: to
@@ -4274,13 +4274,13 @@ function createOidcAuth(_authName, defaultSignInType, _appUrl, oidcConfig, logge
               },
               created: function created() {
                 mgr.signinRedirectCallback().then(function (data) {
-                  external_oidc_["Log"].debug("".concat(_authName, " Window signin callback success"), data); // need to manually redirect for window type
+                  external_oidc_client_["Log"].debug("".concat(_authName, " Window signin callback success"), data); // need to manually redirect for window type
                   // goto original secure route or root
 
                   var redirect = data.state ? data.state.to : null;
                   if (router) router.replace(redirect || '/');else window.location.href = _appUrl;
                 }).catch(function (err) {
-                  external_oidc_["Log"].error("".concat(_authName, " Window signin callback error"), err);
+                  external_oidc_client_["Log"].error("".concat(_authName, " Window signin callback error"), err);
                   if (router) router.replace('/');else window.location.href = _appUrl;
                 });
               }
@@ -4318,7 +4318,7 @@ function createOidcAuth(_authName, defaultSignInType, _appUrl, oidcConfig, logge
       var current = auth.myRouter.currentRoute;
 
       if (current && current.meta.authName === _authName) {
-        external_oidc_["Log"].debug("".concat(_authName, " auth page re-signin with ").concat(defaultSignInType));
+        external_oidc_client_["Log"].debug("".concat(_authName, " auth page re-signin with ").concat(defaultSignInType));
         signInReal(defaultSignInType, {
           state: {
             current: current
@@ -4369,11 +4369,11 @@ function createOidcAuth(_authName, defaultSignInType, _appUrl, oidcConfig, logge
     mgr.events.addUserUnloaded(function () {
       auth.user = null; // redirect if on protected route (best method here?)
 
-      external_oidc_["Log"].debug("".concat(auth.authName, " auth user unloaded"));
+      external_oidc_client_["Log"].debug("".concat(auth.authName, " auth user unloaded"));
       signInIfNecessary();
     });
     mgr.events.addAccessTokenExpired(function () {
-      external_oidc_["Log"].debug("".concat(auth.authName, " auth token expired, user is authenticated=").concat(auth.isAuthenticated));
+      external_oidc_client_["Log"].debug("".concat(auth.authName, " auth token expired, user is authenticated=").concat(auth.isAuthenticated));
       auth.user = null;
       signInIfNecessary(); // if (auth.isAuthenticated) {
       //   mgr
@@ -4390,11 +4390,11 @@ function createOidcAuth(_authName, defaultSignInType, _appUrl, oidcConfig, logge
       // }
     });
     mgr.events.addSilentRenewError(function (e) {
-      external_oidc_["Log"].debug("".concat(auth.authName, " auth silent renew error ").concat(e)); // TODO: need to restart renew manually?
+      external_oidc_client_["Log"].debug("".concat(auth.authName, " auth silent renew error ").concat(e)); // TODO: need to restart renew manually?
 
       if (auth.isAuthenticated) {
         setTimeout(function () {
-          external_oidc_["Log"].debug("".concat(auth.authName, " auth silent renew retry"));
+          external_oidc_client_["Log"].debug("".concat(auth.authName, " auth silent renew retry"));
           mgr.signinSilent();
         }, 5000);
       } else {
@@ -4402,7 +4402,7 @@ function createOidcAuth(_authName, defaultSignInType, _appUrl, oidcConfig, logge
       }
     });
     mgr.events.addUserSignedOut(function () {
-      external_oidc_["Log"].debug("".concat(auth.authName, " auth user signed out"));
+      external_oidc_client_["Log"].debug("".concat(auth.authName, " auth user signed out"));
       auth.user = null;
       signInIfNecessary();
     });

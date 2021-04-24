@@ -26,7 +26,7 @@ module.exports = {
     if (process.env.NODE_ENV === 'production') {
       config.externals({
         ...config.get('externals'),
-        'oidc-client': 'oidc'
+        'oidc-client': 'oidc-client'
       })
     }
   },
