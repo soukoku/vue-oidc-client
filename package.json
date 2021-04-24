@@ -14,7 +14,8 @@
     "vue2/dist/vue-oidc*",
     "vue2/src/vue-oidc*",
     "vue3/dist/vue-oidc*",
-    "vue3/src/vue-oidc*"
+    "vue3/src/vue-oidc*",
+    "polyfill.js"
   ],
   "keywords": [
     "vue",
