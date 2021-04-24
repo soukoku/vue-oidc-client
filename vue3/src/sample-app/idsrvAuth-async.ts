@@ -1,5 +1,4 @@
 import { User } from 'oidc-client'
-import Vue from 'vue'
 import {
   createOidcAuth,
   SignInType,
@@ -66,9 +65,6 @@ export async function configureOidc() {
     // eslint-disable-next-line no-console
     console.log('user session changed')
   })
-
-  // a little something extra
-  Vue.prototype.$oidc = authObj
 
   return authObj
 }

@@ -1,17 +1,20 @@
-import Vue from 'vue'
-import VueRouter, { RouteConfig } from 'vue-router'
+import {
+  createRouter,
+  createWebHistory,
+  Router,
+  RouteRecordRaw
+} from 'vue-router'
 import Home from './views/Home.vue'
 import { configureOidc } from './idsrvAuth-async'
 
-let routerObj = null as VueRouter | null
+let routerObj = null as Router | null
 
 export async function configureRouter() {
   if (routerObj) return Promise.resolve(routerObj)
 
   const idsrvAuth = await configureOidc()
-  Vue.use(VueRouter)
 
-  const routes: Array<RouteConfig> = [
+  const routes: Array<RouteRecordRaw> = [
     {
       path: '/',
       name: 'Home',
@@ -31,9 +34,8 @@ export async function configureRouter() {
     }
   ]
 
-  routerObj = new VueRouter({
-    mode: 'history',
-    base: process.env.BASE_URL,
+  routerObj = createRouter({
+    history: createWebHistory(process.env.BASE_URL),
     routes
   })
 

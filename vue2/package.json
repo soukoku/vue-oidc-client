@@ -2,8 +2,8 @@
   "name": "vue-oidc-client",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve --open src/sample-app/main.ts",
-    "serve-async": "vue-cli-service serve --open src/sample-app/main-async.ts",
+    "serve": "vue-cli-service serve src/sample-app/main.ts",
+    "serve-async": "vue-cli-service serve src/sample-app/main-async.ts",
     "build": "vue-cli-service build --target lib src/vue-oidc-client.ts",
     "lint": "vue-cli-service lint"
   },

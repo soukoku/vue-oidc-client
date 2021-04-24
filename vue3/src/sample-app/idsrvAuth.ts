@@ -1,5 +1,4 @@
 import { User } from 'oidc-client'
-import Vue from 'vue'
 import { createOidcAuth, SignInType, LogLevel } from '../vue-oidc-client'
 
 const loco = window.location
