@@ -12,11 +12,10 @@
   },
   "files": [
     "vue2/dist/vue-oidc*",
-    "vue2/src/lib/vue-oidc*",
+    "vue2/src/vue-oidc*",
     "vue3/dist/vue-oidc*",
-    "vue3/src/lib/vue-oidc*"
+    "vue3/src/vue-oidc*"
   ],
-  "typings": "vue3/src/lib/vue-oidc-client.d.ts",
   "keywords": [
     "vue",
     "openid-connect",

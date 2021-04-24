@@ -7,6 +7,8 @@
     "build": "vue-cli-service build --target lib src/vue-oidc-client.ts",
     "lint": "vue-cli-service lint"
   },
+  "types": "src/vue-oidc-client.d.ts",
+  "main": "dist/vue-oidc-client.umd.min.js",
   "dependencies": {
     "oidc-client": "^1.11.5"
   },

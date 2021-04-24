@@ -1,4 +1,4 @@
-import VueRouter from 'vue-router'
+import Router from 'vue-router'
 import { UserManagerSettings, Logger } from 'oidc-client'
 
 type Dictionary<T> = { [key: string]: T }
@@ -100,7 +100,7 @@ export interface OidcAuth {
    * and register redirect callback routes.
    * @param router - the vue router instance.
    */
-  useRouter(router: VueRouter): void
+  useRouter(router: Router): void
   /**
    * Starts the login flow explicitly.
    * @param args

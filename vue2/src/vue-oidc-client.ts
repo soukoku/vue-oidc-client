@@ -1,5 +1,5 @@
 // vue 2 version
-import VueRouter from 'vue-router'
+import Router from 'vue-router'
 import Vue from 'vue'
 import {
   UserManagerSettings,
@@ -92,7 +92,7 @@ export interface OidcAuth {
    * and register redirect callback routes.
    * @param router - the vue router instance.
    */
-  useRouter(router: VueRouter): void
+  useRouter(router: Router): void
   /**
    * Starts the login flow explicitly.
    * @param args
@@ -178,7 +178,7 @@ export function createOidcAuth(
     data() {
       return {
         user: null as User | null,
-        myRouter: null as VueRouter | null
+        myRouter: null as Router | null
       }
     },
     computed: {
@@ -246,7 +246,7 @@ export function createOidcAuth(
             })
         }
       },
-      useRouter(router: VueRouter) {
+      useRouter(router: Router) {
         this.myRouter = router
 
         router.beforeEach((to, from, next) => {
@@ -369,7 +369,7 @@ export function createOidcAuth(
     return mgr.signinRedirect(args)
   }
 
-  function redirectAfterSignout(router: VueRouter | null) {
+  function redirectAfterSignout(router: Router | null) {
     if (router) {
       const current = router.currentRoute
       if (current && current.meta.authName === authName) {

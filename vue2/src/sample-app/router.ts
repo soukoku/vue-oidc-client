@@ -1,9 +1,9 @@
 import Vue from 'vue'
-import VueRouter, { RouteConfig } from 'vue-router'
+import Router, { RouteConfig } from 'vue-router'
 import Home from './views/Home.vue'
 import idsrvAuth from './idsrvAuth'
 
-Vue.use(VueRouter)
+Vue.use(Router)
 
 const routes: Array<RouteConfig> = [
   {
@@ -25,7 +25,7 @@ const routes: Array<RouteConfig> = [
   }
 ]
 
-const router = new VueRouter({
+const router = new Router({
   mode: 'history',
   base: process.env.BASE_URL,
   routes
