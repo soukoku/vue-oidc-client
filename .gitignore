@@ -1,7 +1,8 @@
 .DS_Store
 node_modules
 demo*
-
+**/sample-app/*.d.ts
+!**/sample-app/shims*.d.ts
 
 # local env files
 .env.local
