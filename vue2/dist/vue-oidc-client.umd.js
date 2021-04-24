@@ -4,9 +4,9 @@
 	else if(typeof define === 'function' && define.amd)
 		define([, "oidc"], factory);
 	else if(typeof exports === 'object')
-		exports["VueOidcAuth"] = factory(require("vue"), require("oidc"));
+		exports["vue-oidc-client"] = factory(require("vue"), require("oidc"));
 	else
-		root["VueOidcAuth"] = factory(root["Vue"], root["oidc"]);
+		root["vue-oidc-client"] = factory(root["Vue"], root["oidc"]);
 })((typeof self !== 'undefined' ? self : this), function(__WEBPACK_EXTERNAL_MODULE__8bbf__, __WEBPACK_EXTERNAL_MODULE_c097__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -1034,7 +1034,7 @@ var getFlags = __webpack_require__("ad6d");
 var stickyHelpers = __webpack_require__("9f7f");
 var redefine = __webpack_require__("6eeb");
 var fails = __webpack_require__("d039");
-var setInternalState = __webpack_require__("69f3").set;
+var enforceInternalState = __webpack_require__("69f3").enforce;
 var setSpecies = __webpack_require__("2626");
 var wellKnownSymbol = __webpack_require__("b622");
 
@@ -1086,7 +1086,10 @@ if (FORCED) {
       RegExpWrapper
     );
 
-    if (UNSUPPORTED_Y && sticky) setInternalState(result, { sticky: sticky });
+    if (UNSUPPORTED_Y && sticky) {
+      var state = enforceInternalState(result);
+      state.sticky = true;
+    }
 
     return result;
   };
@@ -1190,12 +1193,14 @@ module.exports = function (argument) {
 /***/ }),
 
 /***/ "5135":
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
+
+var toObject = __webpack_require__("7b0b");
 
 var hasOwnProperty = {}.hasOwnProperty;
 
-module.exports = function (it, key) {
-  return hasOwnProperty.call(it, key);
+module.exports = function hasOwn(it, key) {
+  return hasOwnProperty.call(toObject(it), key);
 };
 
 
@@ -1316,7 +1321,7 @@ var store = __webpack_require__("c6cd");
 (module.exports = function (key, value) {
   return store[key] || (store[key] = value !== undefined ? value : {});
 })('versions', []).push({
-  version: '3.10.2',
+  version: '3.11.0',
   mode: IS_PURE ? 'pure' : 'global',
   copyright: '© 2021 Denis Pushkarev (zloirock.ru)'
 });
@@ -4040,7 +4045,7 @@ var external_commonjs_vue_commonjs2_vue_root_Vue_default = /*#__PURE__*/__webpac
 // EXTERNAL MODULE: external "oidc"
 var external_oidc_ = __webpack_require__("c097");
 
-// CONCATENATED MODULE: ./src/oidc-auth.ts
+// CONCATENATED MODULE: ./src/vue-oidc-client.ts
 
 
 
@@ -4536,4 +4541,4 @@ module.exports = global.Promise;
 
 /******/ });
 });
-//# sourceMappingURL=VueOidcAuth.umd.js.map
+//# sourceMappingURL=vue-oidc-client.umd.js.map

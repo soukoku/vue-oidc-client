@@ -4,10 +4,19 @@
   "description": "Wrapper around oidc-client-js to to better work in a Vue application with Vue Router integration.",
   "author": "Eugene Wang",
   "license": "MIT",
+  "scripts": {
+    "build": "cd vue2 && npm install --quiet && npm run build && cd ../vue3 && npm install --quiet && npm run build"
+  },
+  "dependencies": {
+    "oidc-client": "^1.11.5"
+  },
   "files": [
-    "vue2/dist/VueOidcAuth*",
-    "vue2/src/lib/oidc*"
+    "vue2/dist/vue-oidc*",
+    "vue2/src/lib/vue-oidc*",
+    "vue3/dist/vue-oidc*",
+    "vue3/src/lib/vue-oidc*"
   ],
+  "typings": "vue3/src/lib/vue-oidc-client.d.ts",
   "keywords": [
     "vue",
     "openid-connect",
@@ -22,8 +31,5 @@
   "bugs": {
     "url": "https://github.com/soukoku/vue-oidc-client/issues"
   },
-  "homepage": "https://github.com/soukoku/vue-oidc-client",
-  "dependencies": {
-    "oidc-client": "^1.11.5"
-  }
+  "homepage": "https://github.com/soukoku/vue-oidc-client"
 }

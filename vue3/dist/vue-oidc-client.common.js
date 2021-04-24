@@ -1025,7 +1025,7 @@ var getFlags = __webpack_require__("ad6d");
 var stickyHelpers = __webpack_require__("9f7f");
 var redefine = __webpack_require__("6eeb");
 var fails = __webpack_require__("d039");
-var setInternalState = __webpack_require__("69f3").set;
+var enforceInternalState = __webpack_require__("69f3").enforce;
 var setSpecies = __webpack_require__("2626");
 var wellKnownSymbol = __webpack_require__("b622");
 
@@ -1077,7 +1077,10 @@ if (FORCED) {
       RegExpWrapper
     );
 
-    if (UNSUPPORTED_Y && sticky) setInternalState(result, { sticky: sticky });
+    if (UNSUPPORTED_Y && sticky) {
+      var state = enforceInternalState(result);
+      state.sticky = true;
+    }
 
     return result;
   };
@@ -1181,12 +1184,14 @@ module.exports = function (argument) {
 /***/ }),
 
 /***/ "5135":
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
+
+var toObject = __webpack_require__("7b0b");
 
 var hasOwnProperty = {}.hasOwnProperty;
 
-module.exports = function (it, key) {
-  return hasOwnProperty.call(it, key);
+module.exports = function hasOwn(it, key) {
+  return hasOwnProperty.call(toObject(it), key);
 };
 
 
@@ -1307,7 +1312,7 @@ var store = __webpack_require__("c6cd");
 (module.exports = function (key, value) {
   return store[key] || (store[key] = value !== undefined ? value : {});
 })('versions', []).push({
-  version: '3.10.2',
+  version: '3.11.0',
   mode: IS_PURE ? 'pure' : 'global',
   copyright: '© 2021 Denis Pushkarev (zloirock.ru)'
 });
@@ -4026,12 +4031,11 @@ var es_regexp_to_string = __webpack_require__("25f0");
 
 // EXTERNAL MODULE: external {"commonjs":"vue","commonjs2":"vue","root":"Vue"}
 var external_commonjs_vue_commonjs2_vue_root_Vue_ = __webpack_require__("8bbf");
-var external_commonjs_vue_commonjs2_vue_root_Vue_default = /*#__PURE__*/__webpack_require__.n(external_commonjs_vue_commonjs2_vue_root_Vue_);
 
 // EXTERNAL MODULE: external "oidc"
 var external_oidc_ = __webpack_require__("c097");
 
-// CONCATENATED MODULE: ./src/oidc-auth.ts
+// CONCATENATED MODULE: ./src/vue-oidc-client.ts
 
 
 
@@ -4105,9 +4109,9 @@ var LogLevel;
  */
 
 
-function createOidcAuth(_authName, defaultSignInType, _appUrl, oidcConfig, logger, logLevel) {
+function createOidcAuth(authName, defaultSignInType, appUrl, oidcConfig, logger, logLevel) {
   // arg check
-  if (!_authName) {
+  if (!authName) {
     throw new Error('Auth name is required.');
   }
 
@@ -4115,7 +4119,7 @@ function createOidcAuth(_authName, defaultSignInType, _appUrl, oidcConfig, logge
     throw new Error('Only window or popup are valid default signin types.');
   }
 
-  if (!_appUrl) {
+  if (!appUrl) {
     throw new Error('App base url is required.');
   }
 
@@ -4125,7 +4129,7 @@ function createOidcAuth(_authName, defaultSignInType, _appUrl, oidcConfig, logge
 
   external_oidc_["Log"].logger = logger || console;
   external_oidc_["Log"].level = logLevel || LogLevel.Error;
-  var nameSlug = slugify(_authName); // merge passed oidcConfig with defaults
+  var nameSlug = slugify(authName); // merge passed oidcConfig with defaults
 
   var config = _objectSpread2({
     response_type: 'id_token',
@@ -4134,177 +4138,158 @@ function createOidcAuth(_authName, defaultSignInType, _appUrl, oidcConfig, logge
     userStore: new external_oidc_["WebStorageStateStore"]({
       store: sessionStorage
     }),
-    post_logout_redirect_uri: _appUrl,
-    redirect_uri: "".concat(_appUrl, "auth/signinwin/").concat(nameSlug),
-    popup_post_logout_redirect_uri: "".concat(_appUrl, "auth/signoutpop/").concat(nameSlug),
-    popup_redirect_uri: "".concat(_appUrl, "auth/signinpop/").concat(nameSlug),
-    silent_redirect_uri: "".concat(_appUrl, "auth/signinsilent/").concat(nameSlug)
+    post_logout_redirect_uri: appUrl,
+    redirect_uri: "".concat(appUrl, "auth/signinwin/").concat(nameSlug),
+    popup_post_logout_redirect_uri: "".concat(appUrl, "auth/signoutpop/").concat(nameSlug),
+    popup_redirect_uri: "".concat(appUrl, "auth/signinpop/").concat(nameSlug),
+    silent_redirect_uri: "".concat(appUrl, "auth/signinsilent/").concat(nameSlug)
   }, oidcConfig);
 
-  external_oidc_["Log"].debug("Creating new oidc auth as ".concat(_authName));
+  external_oidc_["Log"].debug("Creating new oidc auth as ".concat(authName));
   var mgr = new external_oidc_["UserManager"](config);
   var _inited = false;
-  var auth = new external_commonjs_vue_commonjs2_vue_root_Vue_default.a({
-    data: function data() {
-      return {
-        user: null,
-        myRouter: null
+  var myRouter = null;
+  var user = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["ref"])(null);
+  var authObj = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["reactive"])({
+    appUrl: appUrl,
+    authName: authName,
+    isAuthenticated: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["computed"])(function () {
+      return !!user.value && !user.value.expired;
+    }),
+    accessToken: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["computed"])(function () {
+      return !!user.value && !user.value.expired ? user.value.access_token : '';
+    }),
+    userProfile: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["computed"])(function () {
+      return !!user.value && !user.value.expired ? user.value.profile : {
+        iss: '',
+        sub: '',
+        aud: '',
+        exp: 0,
+        iat: 0
       };
+    }),
+    events: mgr.events,
+    signIn: function signIn(args) {
+      return signInReal(defaultSignInType, args);
     },
-    computed: {
-      appUrl: function appUrl() {
-        return _appUrl;
-      },
-      authName: function authName() {
-        return _authName;
-      },
-      isAuthenticated: function isAuthenticated() {
-        return !!this.user && !this.user.expired;
-      },
-      accessToken: function accessToken() {
-        return !!this.user && !this.user.expired ? this.user.access_token : '';
-      },
-      userProfile: function userProfile() {
-        return !!this.user && !this.user.expired ? this.user.profile : {
-          iss: '',
-          sub: '',
-          aud: '',
-          exp: 0,
-          iat: 0
-        };
-      },
-      events: function events() {
-        return mgr.events;
+    signOut: function signOut(args) {
+      if (defaultSignInType === SignInType.Popup) {
+        return mgr.signoutPopup(args).then(function () {
+          redirectAfterSignout(myRouter);
+        }).catch(function () {
+          // could be window closed
+          redirectAfterSignout(myRouter);
+        });
+      }
+
+      return mgr.signoutRedirect(args);
+    },
+    startSilentRenew: function startSilentRenew() {
+      mgr.startSilentRenew();
+    },
+    stopSilentRenew: function stopSilentRenew() {
+      mgr.stopSilentRenew();
+    },
+    startup: function startup() {
+      var isCB = false; // CB = callback
+
+      if (matchesPath(config.popup_redirect_uri)) {
+        external_oidc_["Log"].debug("".concat(authName, " Popup signin callback"));
+        mgr.signinPopupCallback();
+        isCB = true;
+      } else if (matchesPath(config.silent_redirect_uri)) {
+        external_oidc_["Log"].debug("".concat(authName, " Silent signin callback"));
+        mgr.signinSilentCallback();
+        isCB = true;
+      } else if (matchesPath(config.popup_post_logout_redirect_uri)) {
+        external_oidc_["Log"].debug("".concat(authName, " Popup logout callback"));
+        mgr.signoutPopupCallback();
+        isCB = true;
+      }
+
+      if (isCB) return Promise.resolve(false);
+
+      if (_inited) {
+        return Promise.resolve(true);
+      } else {
+        // load user from storage
+        return mgr.getUser().then(function (test) {
+          _inited = true;
+
+          if (test && !test.expired) {
+            user.value = test;
+          }
+
+          return true;
+        }).catch(function (err) {
+          external_oidc_["Log"].warn("Auth startup err = ".concat(err));
+          return false;
+        });
       }
     },
-    methods: {
-      startup: function startup() {
-        var _this = this;
-
-        var isCB = false; // CB = callback
-
-        if (matchesPath(config.popup_redirect_uri)) {
-          external_oidc_["Log"].debug("".concat(_authName, " Popup signin callback"));
-          mgr.signinPopupCallback();
-          isCB = true;
-        } else if (matchesPath(config.silent_redirect_uri)) {
-          external_oidc_["Log"].debug("".concat(_authName, " Silent signin callback"));
-          mgr.signinSilentCallback();
-          isCB = true;
-        } else if (matchesPath(config.popup_post_logout_redirect_uri)) {
-          external_oidc_["Log"].debug("".concat(_authName, " Popup logout callback"));
-          mgr.signoutPopupCallback();
-          isCB = true;
-        }
-
-        if (isCB) return Promise.resolve(false);
-
-        if (_inited) {
-          return Promise.resolve(true);
+    useRouter: function useRouter(router) {
+      myRouter = router;
+      router.beforeEach(function (to, from, next) {
+        if (to.matched.some(function (record) {
+          return record.meta.authName === authObj.authName;
+        })) {
+          if (authObj.isAuthenticated) {
+            external_oidc_["Log"].debug("".concat(authName, " auth authenticated user entering protected route ").concat(to.fullPath));
+            next();
+          } else {
+            external_oidc_["Log"].debug("".concat(authName, " auth anon user entering protected route ").concat(to.fullPath));
+            signInReal(defaultSignInType, {
+              state: {
+                to: to
+              }
+            }).then(function () {
+              if (defaultSignInType === SignInType.Window) {
+                next(false);
+              } else {
+                next();
+              }
+            }).catch(function () {
+              return next(false);
+            });
+          }
         } else {
-          // load user from storage
-          return mgr.getUser().then(function (test) {
-            _inited = true;
-
-            if (test && !test.expired) {
-              _this.user = test;
-            }
-
-            return true;
-          }).catch(function (err) {
-            external_oidc_["Log"].warn("Auth startup err = ".concat(err));
-            return false;
-          });
+          next();
         }
-      },
-      useRouter: function useRouter(router) {
-        var _this2 = this;
+      });
 
-        this.myRouter = router;
-        router.beforeEach(function (to, from, next) {
-          if (to.matched.some(function (record) {
-            return record.meta.authName === _this2.authName;
-          })) {
-            if (_this2.isAuthenticated) {
-              external_oidc_["Log"].debug("".concat(_authName, " auth authenticated user entering protected route ").concat(to.fullPath));
-              next();
-            } else {
-              external_oidc_["Log"].debug("".concat(_authName, " auth anon user entering protected route ").concat(to.fullPath));
-              signInReal(defaultSignInType, {
-                state: {
-                  to: to
-                }
-              }).then(function () {
-                if (defaultSignInType === SignInType.Window) {
-                  next(false);
-                } else {
-                  next();
-                }
-              }).catch(function () {
-                return next(false);
+      if (config.redirect_uri) {
+        var vroutePath = '/' + getUrlPath(config.redirect_uri).substring((router.options.history.base || '/').length);
+        router.addRoute({
+          path: vroutePath,
+          name: "signinwin-".concat(nameSlug),
+          component: {
+            render: function render() {
+              return Object(external_commonjs_vue_commonjs2_vue_root_Vue_["h"])('div');
+            },
+            created: function created() {
+              mgr.signinRedirectCallback().then(function (data) {
+                external_oidc_["Log"].debug("".concat(authName, " Window signin callback success"), data); // need to manually redirect for window type
+                // goto original secure route or root
+
+                var redirect = data.state ? data.state.to : null;
+                if (router) router.replace(redirect || '/');else window.location.href = appUrl;
+              }).catch(function (err) {
+                external_oidc_["Log"].error("".concat(authName, " Window signin callback error"), err);
+                if (router) router.replace('/');else window.location.href = appUrl;
               });
             }
-          } else {
-            next();
           }
         });
-
-        if (config.redirect_uri) {
-          var vroutePath = '/' + getUrlPath(config.redirect_uri).substring((router.options.base || '/').length);
-          router.addRoute({
-            path: vroutePath,
-            name: "signinwin-".concat(nameSlug),
-            component: {
-              render: function render(h) {
-                return h('div');
-              },
-              created: function created() {
-                mgr.signinRedirectCallback().then(function (data) {
-                  external_oidc_["Log"].debug("".concat(_authName, " Window signin callback success"), data); // need to manually redirect for window type
-                  // goto original secure route or root
-
-                  var redirect = data.state ? data.state.to : null;
-                  if (router) router.replace(redirect || '/');else window.location.href = _appUrl;
-                }).catch(function (err) {
-                  external_oidc_["Log"].error("".concat(_authName, " Window signin callback error"), err);
-                  if (router) router.replace('/');else window.location.href = _appUrl;
-                });
-              }
-            }
-          });
-        }
-      },
-      signIn: function signIn(args) {
-        return signInReal(defaultSignInType, args);
-      },
-      signOut: function signOut(args) {
-        if (defaultSignInType === SignInType.Popup) {
-          var router = this.myRouter;
-          return mgr.signoutPopup(args).then(function () {
-            redirectAfterSignout(router);
-          }).catch(function () {
-            // could be window closed
-            redirectAfterSignout(router);
-          });
-        }
-
-        return mgr.signoutRedirect(args);
-      },
-      startSilentRenew: function startSilentRenew() {
-        mgr.startSilentRenew();
-      },
-      stopSilentRenew: function stopSilentRenew() {
-        mgr.stopSilentRenew();
       }
     }
   });
 
   function signInIfNecessary() {
-    if (auth.myRouter) {
-      var current = auth.myRouter.currentRoute;
+    if (myRouter) {
+      var current = myRouter.currentRoute.value;
 
-      if (current && current.meta.authName === _authName) {
-        external_oidc_["Log"].debug("".concat(_authName, " auth page re-signin with ").concat(defaultSignInType));
+      if (current && current.meta.authName === authName) {
+        external_oidc_["Log"].debug("".concat(authName, " auth page re-signin with ").concat(defaultSignInType));
         signInReal(defaultSignInType, {
           state: {
             current: current
@@ -4331,16 +4316,16 @@ function createOidcAuth(_authName, defaultSignInType, _appUrl, oidcConfig, logge
 
   function redirectAfterSignout(router) {
     if (router) {
-      var current = router.currentRoute;
+      var current = router.currentRoute.value;
 
-      if (current && current.meta.authName === _authName) {
+      if (current && current.meta.authName === authName) {
         router.replace('/');
         return;
       }
     } //   window.location.reload(true);
 
 
-    if (_appUrl) window.location.href = _appUrl;
+    if (appUrl) window.location.href = appUrl;
   }
   /**
    * Translates user manager events to vue events and perform default actions
@@ -4349,18 +4334,18 @@ function createOidcAuth(_authName, defaultSignInType, _appUrl, oidcConfig, logge
 
 
   function handleManagerEvents() {
-    mgr.events.addUserLoaded(function (user) {
-      auth.user = user;
+    mgr.events.addUserLoaded(function (newUser) {
+      user.value = newUser;
     });
     mgr.events.addUserUnloaded(function () {
-      auth.user = null; // redirect if on protected route (best method here?)
+      user.value = null; // redirect if on protected route (best method here?)
 
-      external_oidc_["Log"].debug("".concat(auth.authName, " auth user unloaded"));
+      external_oidc_["Log"].debug("".concat(authName, " auth user unloaded"));
       signInIfNecessary();
     });
     mgr.events.addAccessTokenExpired(function () {
-      external_oidc_["Log"].debug("".concat(auth.authName, " auth token expired, user is authenticated=").concat(auth.isAuthenticated));
-      auth.user = null;
+      external_oidc_["Log"].debug("".concat(authName, " auth token expired, user is authenticated=").concat(authObj.isAuthenticated));
+      user.value = null;
       signInIfNecessary(); // if (auth.isAuthenticated) {
       //   mgr
       //     .signinSilent()
@@ -4376,11 +4361,11 @@ function createOidcAuth(_authName, defaultSignInType, _appUrl, oidcConfig, logge
       // }
     });
     mgr.events.addSilentRenewError(function (e) {
-      external_oidc_["Log"].debug("".concat(auth.authName, " auth silent renew error ").concat(e)); // TODO: need to restart renew manually?
+      external_oidc_["Log"].debug("".concat(authName, " auth silent renew error ").concat(e)); // TODO: need to restart renew manually?
 
-      if (auth.isAuthenticated) {
+      if (authObj.isAuthenticated) {
         setTimeout(function () {
-          external_oidc_["Log"].debug("".concat(auth.authName, " auth silent renew retry"));
+          external_oidc_["Log"].debug("".concat(authName, " auth silent renew retry"));
           mgr.signinSilent();
         }, 5000);
       } else {
@@ -4388,14 +4373,14 @@ function createOidcAuth(_authName, defaultSignInType, _appUrl, oidcConfig, logge
       }
     });
     mgr.events.addUserSignedOut(function () {
-      external_oidc_["Log"].debug("".concat(auth.authName, " auth user signed out"));
-      auth.user = null;
+      external_oidc_["Log"].debug("".concat(authName, " auth user signed out"));
+      user.value = null;
       signInIfNecessary();
     });
   }
 
   handleManagerEvents();
-  return auth;
+  return authObj;
 } // general utilities
 
 /**
@@ -4526,4 +4511,4 @@ module.exports = global.Promise;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=VueOidcAuth.common.js.map
+//# sourceMappingURL=vue-oidc-client.common.js.map

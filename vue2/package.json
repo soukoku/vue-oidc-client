@@ -1,11 +1,10 @@
 {
-  "name": "vue2",
-  "version": "0.1.0",
+  "name": "vue-oidc-client",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve --open src/sample-app/main.ts",
     "serve-async": "vue-cli-service serve --open src/sample-app/main-async.ts",
-    "build": "vue-cli-service build --target lib --name VueOidcAuth src/oidc-auth.ts",
+    "build": "vue-cli-service build --target lib src/vue-oidc-client.ts",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
@@ -20,7 +19,7 @@
     "@vue/cli-plugin-typescript": "~4.5.12",
     "@vue/cli-service": "~4.5.12",
     "@vue/eslint-config-typescript": "^7.0.0",
-    "core-js": "^3.10.2",
+    "core-js": "^3.11.0",
     "eslint": "^6.8.0",
     "eslint-plugin-vue": "^6.2.2",
     "typescript": "~4.2.4",
