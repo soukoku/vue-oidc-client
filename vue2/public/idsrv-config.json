@@ -1,0 +1,6 @@
+{
+    "authority": "https://demo.identityserver.io",
+    "client_id": "interactive.public",
+    "response_type": "code",
+    "scope": "openid profile email api offline_access"
+}
