@@ -4162,6 +4162,7 @@ function createOidcAuth(authName, defaultSignInType, appUrl, oidcConfig, logger,
   var authObj = Object(external_commonjs_vue_commonjs2_vue_root_Vue_["reactive"])({
     appUrl: appUrl,
     authName: authName,
+    user: user,
     isAuthenticated: Object(external_commonjs_vue_commonjs2_vue_root_Vue_["computed"])(function () {
       return !!user.value && !user.value.expired;
     }),
