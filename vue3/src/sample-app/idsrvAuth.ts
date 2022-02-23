@@ -6,7 +6,7 @@ const appRootUrl = `${loco.protocol}//${loco.host}${process.env.BASE_URL}`
 
 const idsrvAuth = createOidcAuth(
   'main',
-  SignInType.Popup,
+  SignInType.Window,
   appRootUrl,
   {
     authority: 'https://demo.identityserver.io/',

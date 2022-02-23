@@ -395,7 +395,7 @@ export function createOidcAuth(
 
       // redirect if on protected route (best method here?)
       Log.debug(`${auth.authName} auth user unloaded`)
-      signInIfNecessary()
+      // signInIfNecessary()
     })
 
     mgr.events.addAccessTokenExpired(() => {

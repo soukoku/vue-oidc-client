@@ -1,14 +1,11 @@
 <template>
   <div id="nav">
-    <router-link to="/">Vue 3 Home</router-link> |
-    <router-link to="/about">About (Protected) </router-link> |
-    <a href="#" @click="$oidc.signOut()" v-if="$oidc.isAuthenticated"
-      >Signout</a
-    >
+    <router-link to="/">Vue 3 Home</router-link>|
+    <router-link to="/about">About (Protected)</router-link>|
+    <a href="#" @click.prevent="$oidc.signOut" v-if="$oidc.isAuthenticated">Signout</a>
   </div>
   <router-view />
 </template>
-
 <style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;

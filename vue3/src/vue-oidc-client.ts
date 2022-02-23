@@ -212,6 +212,7 @@ export function createOidcAuth(
             redirectAfterSignout(myRouter)
           })
       }
+      mgr.stopSilentRenew()
       return mgr.signoutRedirect(args)
     },
     startSilentRenew() {
@@ -377,7 +378,7 @@ export function createOidcAuth(
 
       // redirect if on protected route (best method here?)
       Log.debug(`${authName} auth user unloaded`)
-      signInIfNecessary()
+      // signInIfNecessary()
     })
 
     mgr.events.addAccessTokenExpired(() => {

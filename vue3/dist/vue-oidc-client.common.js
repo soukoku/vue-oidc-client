@@ -4183,6 +4183,7 @@ function createOidcAuth(authName, defaultSignInType, appUrl, oidcConfig, logger,
         });
       }
 
+      mgr.stopSilentRenew();
       return mgr.signoutRedirect(args);
     },
     startSilentRenew: function startSilentRenew() {
@@ -4341,8 +4342,7 @@ function createOidcAuth(authName, defaultSignInType, appUrl, oidcConfig, logger,
     mgr.events.addUserUnloaded(function () {
       user.value = null; // redirect if on protected route (best method here?)
 
-      external_oidc_client_["Log"].debug("".concat(authName, " auth user unloaded"));
-      signInIfNecessary();
+      external_oidc_client_["Log"].debug("".concat(authName, " auth user unloaded")); // signInIfNecessary()
     });
     mgr.events.addAccessTokenExpired(function () {
       external_oidc_client_["Log"].debug("".concat(authName, " auth token expired, user is authenticated=").concat(authObj.isAuthenticated));

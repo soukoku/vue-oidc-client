@@ -4360,8 +4360,7 @@ function createOidcAuth(_authName, defaultSignInType, _appUrl, oidcConfig, logge
     mgr.events.addUserUnloaded(function () {
       auth.user = null; // redirect if on protected route (best method here?)
 
-      external_oidc_client_["Log"].debug("".concat(auth.authName, " auth user unloaded"));
-      signInIfNecessary();
+      external_oidc_client_["Log"].debug("".concat(auth.authName, " auth user unloaded")); // signInIfNecessary()
     });
     mgr.events.addAccessTokenExpired(function () {
       external_oidc_client_["Log"].debug("".concat(auth.authName, " auth token expired, user is authenticated=").concat(auth.isAuthenticated));

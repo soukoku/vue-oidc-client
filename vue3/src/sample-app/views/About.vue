@@ -16,7 +16,6 @@ export default {
       return { ...this.$oidc.userProfile, accessToken: this.$oidc.accessToken }
     },
     claims() {
-      debugger
       if (this.user) {
         return Object.keys(this.user).map(key => ({
           key,
