@@ -343,7 +343,7 @@ export function createOidcAuth(
   function signInIfNecessary() {
     if (auth.myRouter) {
       const current = auth.myRouter.currentRoute
-      if (current && current.meta.authName === authName) {
+      if (current && current.meta && current.meta.authName === authName) {
         Log.debug(`${authName} auth page re-signin with ${defaultSignInType}`)
 
         signInReal(defaultSignInType, { state: { current } })
@@ -372,7 +372,7 @@ export function createOidcAuth(
   function redirectAfterSignout(router: Router | null) {
     if (router) {
       const current = router.currentRoute
-      if (current && current.meta.authName === authName) {
+      if (current && current.meta && current.meta.authName === authName) {
         router.replace('/')
         return
       }
