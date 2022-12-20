@@ -1,5 +1,5 @@
 import { Router } from 'vue-router';
-import { UserManagerSettings, Logger, User, Profile, UserManagerEvents } from 'oidc-client';
+import { UserManagerSettings, Logger, User, UserManager, Profile, UserManagerEvents } from 'oidc-client';
 /**
  * Indicates the sign in behavior.
  */
@@ -71,6 +71,10 @@ export interface OidcAuth {
      * Required call before all the properties are reliably initialized.
      * Should be called and waited on before starting the root Vue instance.
      */
+    /**
+     * User manager from oidc-client-ts
+     */
+    readonly mgr: UserManager;
     startup(): Promise<boolean>;
     /**
      * Hookup this auth instance with a vue-router instance.

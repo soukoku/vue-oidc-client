@@ -85,6 +85,12 @@ export interface OidcAuth {
    * Required call before all the properties are reliably initialized.
    * Should be called and waited on before starting the root Vue instance.
    */
+
+  /**
+   * User manager from oidc-client-ts
+   */
+  readonly mgr: UserManager;
+
   startup(): Promise<boolean>
   /**
    * Hookup this auth instance with a vue-router instance.
@@ -180,6 +186,7 @@ export function createOidcAuth(
   const authObj = reactive({
     appUrl,
     authName,
+    mgr,
     user,
     isAuthenticated: computed(() => !!user.value && !user.value.expired),
     accessToken: computed(() =>

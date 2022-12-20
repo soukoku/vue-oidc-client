@@ -177,6 +177,7 @@ export function createOidcAuth(
   const auth = new Vue({
     data() {
       return {
+        mgr,
         user: null as User | null,
         myRouter: null as Router | null
       }
