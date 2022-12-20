@@ -1,11 +1,10 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-import { configureRouter } from './router-async'
+import router from './router'
 import { configureOidc } from './idsrvAuth-async'
 
 void (async function() {
   const idsrvAuth = await configureOidc()
-  const router = await configureRouter()
 
   idsrvAuth.startup().then(ok => {
     if (ok) {
