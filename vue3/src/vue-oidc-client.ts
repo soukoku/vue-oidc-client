@@ -180,6 +180,7 @@ export function createOidcAuth(
   const authObj = reactive({
     appUrl,
     authName,
+    mgr,
     user,
     isAuthenticated: computed(() => !!user.value && !user.value.expired),
     accessToken: computed(() =>
